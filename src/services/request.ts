@@ -1,6 +1,16 @@
 import type { ApiResponse } from '@/types/api'
 
-function buildRequestUrl(path: string): string {
+function joinUrl(base: string, path: string): string {
+  if (base.endsWith('/') && path.startsWith('/')) {
+    return `${base.slice(0, -1)}${path}`
+  }
+  if (!base.endsWith('/') && !path.startsWith('/')) {
+    return `${base}/${path}`
+  }
+  return `${base}${path}`
+}
+
+export function resolveApiUrl(path: string): string {
   const base = import.meta.env.VITE_API_BASE_URL || ''
   if (!base) {
     return path
@@ -8,10 +18,18 @@ function buildRequestUrl(path: string): string {
 
   // Avoid duplicated /api prefix when both base and path include it.
   if (base === '/api' && path.startsWith('/api/')) {
-    return path
+    const uniPlatform = String(uni.getSystemInfoSync().uniPlatform || '').toLowerCase()
+    if (uniPlatform === 'h5' || uniPlatform === 'web') {
+      return path
+    }
+
+    const proxyTarget = import.meta.env.VITE_API_PROXY_TARGET || ''
+    if (proxyTarget) {
+      return joinUrl(proxyTarget, path)
+    }
   }
 
-  return `${base}${path}`
+  return joinUrl(base, path)
 }
 
 function handleResponse<T>(res: UniApp.RequestSuccessCallbackResult): T {
@@ -31,22 +49,23 @@ interface RequestOptions {
   method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
   data?: Record<string, unknown>
   header?: Record<string, string>
+  withAuth?: boolean
 }
 
 type RequestData = Record<string, unknown>
 
 export function request<T>(options: RequestOptions): Promise<T> {
-  const { url, method = 'GET', data, header = {} } = options
+  const { url, method = 'GET', data, header = {}, withAuth = true } = options
   const token = getToken()
 
   return new Promise((resolve, reject) => {
     uni.request({
-      url: buildRequestUrl(url),
+      url: resolveApiUrl(url),
       method,
       data: data as RequestData,
       header: {
         'Content-Type': 'application/json',
-        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        ...(withAuth && token ? { Authorization: `Bearer ${token}` } : {}),
         ...header,
       },
       success: (res) => {
