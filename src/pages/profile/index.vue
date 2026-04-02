@@ -66,6 +66,7 @@ onMounted(() => {
           <text class="row"><text class="label">公告：</text>{{ profile.quickEntry.announcementsCount }}</text>
           <text class="row"><text class="label">审批：</text>{{ profile.quickEntry.approvalsCount }}</text>
           <text class="row"><text class="label">知识库：</text>{{ profile.quickEntry.knowledgeCount }}</text>
+          <text class="row"><text class="label">未读通知：</text>{{ profile.quickEntry.unreadNotifications }}</text>
         </view>
 
         <view class="profile-card">

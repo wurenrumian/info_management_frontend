@@ -45,7 +45,6 @@ pnpm build:h5         # H5
 - [开发规范](docs/development-standard.md)
 - [功能设计](docs/superpowers/specs/)
 - [实现计划](docs/superpowers/plans/)
-- [后端 API 缺口清单](docs/api-gaps/backend-required-apis.md)
 
 ## 后端仓库
 

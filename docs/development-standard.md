@@ -278,6 +278,8 @@ export function shareToWeixin(title: string, path: string): void {
 
 ## 12. 前后端联调流程
 
+新增 API（或变更现有 API 的请求/响应结构）必须先在后端仓库提 Issue，对齐后再进入开发。
+
 1. 先对齐 API 文档（后端 `docs/api/`）
 2. 前端根据 API 文档定义 types 和 service 层
 3. 使用 mock 数据开发页面（可选）
