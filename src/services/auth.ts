@@ -1,6 +1,6 @@
 import { request } from './request'
 import type { AuthToken, UserInfo } from '@/types/user'
-import { API_AUTH_LOGIN, API_AUTH_BIND, API_AUTH_USER_INFO } from '@/constants/api'
+import { API_AUTH_LOGIN, API_AUTH_BIND, API_AUTH_USER_INFO, API_AUTH_USER_INFO_LEGACY } from '@/constants/api'
 
 export function wechatLogin(code: string) {
   return request<AuthToken>({
@@ -22,5 +22,10 @@ export function getUserInfo() {
   return request<UserInfo>({
     url: API_AUTH_USER_INFO,
     method: 'GET',
+  }).catch(() => {
+    return request<UserInfo>({
+      url: API_AUTH_USER_INFO_LEGACY,
+      method: 'GET',
+    })
   })
 }

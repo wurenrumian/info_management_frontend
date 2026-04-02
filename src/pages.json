@@ -11,6 +11,12 @@
       "style": {
         "navigationBarTitleText": "样式预览"
       }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "个人主页"
+      }
     }
   ],
   "globalStyle": {

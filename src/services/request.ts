@@ -1,5 +1,19 @@
 import type { ApiResponse } from '@/types/api'
 
+function buildRequestUrl(path: string): string {
+  const base = import.meta.env.VITE_API_BASE_URL || ''
+  if (!base) {
+    return path
+  }
+
+  // Avoid duplicated /api prefix when both base and path include it.
+  if (base === '/api' && path.startsWith('/api/')) {
+    return path
+  }
+
+  return `${base}${path}`
+}
+
 function handleResponse<T>(res: UniApp.RequestSuccessCallbackResult): T {
   const data = res.data as ApiResponse<T>
   if (data.error) {
@@ -27,7 +41,7 @@ export function request<T>(options: RequestOptions): Promise<T> {
 
   return new Promise((resolve, reject) => {
     uni.request({
-      url: `${import.meta.env.VITE_API_BASE_URL || ''}${url}`,
+      url: buildRequestUrl(url),
       method,
       data: data as RequestData,
       header: {

@@ -1,21 +1,36 @@
 <script setup lang="ts">
+import LayoutShell from '@/components/layout-shell.vue'
+
 function goToStyleShowcase() {
   uni.navigateTo({
     url: '/pages/style-showcase/index',
   })
 }
+
+function goToProfile() {
+  uni.reLaunch({
+    url: '/pages/profile/index',
+  })
+}
 </script>
 
 <template>
-  <view class="home">
-    <view class="hero-card">
-      <text class="hero-title">学院事务一站式系统</text>
-      <text class="hero-subtitle">通知、审批与流程统一入口</text>
-      <button class="preview-button" @tap="goToStyleShowcase">
-        查看样式预览页
-      </button>
+  <layout-shell current="home">
+    <view class="home">
+      <view class="hero-card">
+        <text class="hero-title">学院事务一站式系统</text>
+        <text class="hero-subtitle">通知、审批与流程统一入口</text>
+        <view class="button-row">
+          <button class="preview-button" @tap="goToProfile">
+            前往个人主页
+          </button>
+          <button class="preview-button preview-button--secondary" @tap="goToStyleShowcase">
+            查看样式预览页
+          </button>
+        </view>
+      </view>
     </view>
-  </view>
+  </layout-shell>
 </template>
 
 <style scoped lang="scss">
@@ -55,5 +70,16 @@ function goToStyleShowcase() {
   border: 1px solid var(--color-primary);
   border-radius: var(--radius-md);
   font-size: var(--font-size-md);
+}
+
+.button-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.preview-button--secondary {
+  background: var(--color-surface);
+  color: var(--color-primary);
 }
 </style>
