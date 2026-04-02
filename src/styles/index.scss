@@ -1,0 +1,30 @@
+@use './tokens.scss';
+@use './mixins.scss';
+@use './utilities.scss';
+
+view,
+text,
+button,
+input,
+textarea,
+image,
+scroll-view,
+navigator {
+  box-sizing: border-box;
+}
+
+page {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-size: var(--font-size-md);
+  line-height: 1.5;
+}
+
+view,
+text,
+button,
+input,
+textarea {
+  font-family: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  color: inherit;
+}
