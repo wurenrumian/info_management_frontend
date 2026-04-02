@@ -1,35 +1,22 @@
 {
-  "root": {
-    "pages": [
-      "pages/home/index"
-    ],
-    "globalStyle": {
-      "navigationBarTextStyle": "black",
-      "navigationBarTitleText": "学院事务",
-      "navigationBarBackgroundColor": "#F8F8F8",
-      "backgroundColor": "#F8F8F8"
-    },
-    "subPackages": [
-      {
-        "root": "subpackages/knowledge",
-        "pages": []
-      },
-      {
-        "root": "subpackages/announcements",
-        "pages": []
-      },
-      {
-        "root": "subpackages/approvals",
-        "pages": []
-      },
-      {
-        "root": "subpackages/partyflow",
-        "pages": []
-      },
-      {
-        "root": "subpackages/profile",
-        "pages": []
+  "pages": [
+    {
+      "path": "pages/home/index",
+      "style": {
+        "navigationBarTitleText": "学院事务"
       }
-    ]
+    },
+    {
+      "path": "pages/style-showcase/index",
+      "style": {
+        "navigationBarTitleText": "样式预览"
+      }
+    }
+  ],
+  "globalStyle": {
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "学院事务",
+    "navigationBarBackgroundColor": "#F8F8F8",
+    "backgroundColor": "#F8F8F8"
   }
 }

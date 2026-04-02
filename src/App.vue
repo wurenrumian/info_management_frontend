@@ -14,8 +14,10 @@ onHide(() => {
 })
 </script>
 
-<style>
+<style lang="scss">
+@use './styles/index.scss';
+
 page {
-  background-color: #f5f5f5;
+  background-color: var(--color-bg);
 }
 </style>
