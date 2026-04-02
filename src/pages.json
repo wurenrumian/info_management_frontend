@@ -1,6 +1,18 @@
 {
   "pages": [
     {
+      "path": "pages/auth/login",
+      "style": {
+        "navigationBarTitleText": "登录"
+      }
+    },
+    {
+      "path": "pages/auth/register",
+      "style": {
+        "navigationBarTitleText": "注册/绑定"
+      }
+    },
+    {
       "path": "pages/home/index",
       "style": {
         "navigationBarTitleText": "学院事务"
@@ -10,6 +22,12 @@
       "path": "pages/style-showcase/index",
       "style": {
         "navigationBarTitleText": "样式预览"
+      }
+    },
+    {
+      "path": "pages/profile/index",
+      "style": {
+        "navigationBarTitleText": "个人主页"
       }
     }
   ],

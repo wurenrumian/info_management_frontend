@@ -1,10 +1,10 @@
-import { request } from './request'
+import { request, resolveApiUrl } from './request'
 import { API_FILE_UPLOAD, API_FILE_DOWNLOAD } from '@/constants/api'
 
 export function uploadFile(filePath: string) {
   return new Promise<{ file_id: number; title: string }>((resolve, reject) => {
     uni.uploadFile({
-      url: `${import.meta.env.VITE_API_BASE_URL || ''}${API_FILE_UPLOAD}`,
+      url: resolveApiUrl(API_FILE_UPLOAD),
       filePath,
       name: 'file',
       header: {

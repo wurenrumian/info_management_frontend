@@ -1,7 +1,7 @@
 import { request } from './request'
 import type { Approval, ApprovalSubmitParams } from '@/types/approvals'
 import type { ListResponse, PaginationParams } from '@/types/api'
-import { API_APPROVAL_SUBMIT, API_APPROVAL_LIST, API_APPROVAL_DETAIL, API_APPROVAL_ACTION } from '@/constants/api'
+import { API_APPROVAL_SUBMIT, API_APPROVAL_LIST, API_APPROVAL_ME_LIST, API_APPROVAL_DETAIL, API_APPROVAL_ACTION } from '@/constants/api'
 
 export function submitApproval(data: ApprovalSubmitParams) {
   return request<Approval>({
@@ -14,6 +14,14 @@ export function submitApproval(data: ApprovalSubmitParams) {
 export function getApprovalList(params: PaginationParams & { status?: string }) {
   return request<ListResponse<Approval>>({
     url: API_APPROVAL_LIST,
+    method: 'GET',
+    data: params as unknown as Record<string, unknown>,
+  })
+}
+
+export function getMyApprovalList(params: PaginationParams & { status?: string }) {
+  return request<ListResponse<Approval>>({
+    url: API_APPROVAL_ME_LIST,
     method: 'GET',
     data: params as unknown as Record<string, unknown>,
   })

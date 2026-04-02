@@ -1,9 +1,18 @@
+function getUniPlatform(): string {
+  try {
+    const systemInfo = uni.getSystemInfoSync()
+    return String(systemInfo.uniPlatform || '').toLowerCase()
+  } catch {
+    return ''
+  }
+}
+
 export function isWeixinMiniProgram(): boolean {
-  const systemInfo = uni.getSystemInfoSync()
-  return systemInfo.uniPlatform === 'mp-weixin'
+  const platform = getUniPlatform()
+  return platform === 'mp-weixin'
 }
 
 export function isH5(): boolean {
-  const systemInfo = uni.getSystemInfoSync()
-  return systemInfo.uniPlatform === 'h5'
+  const platform = getUniPlatform()
+  return platform === 'h5' || platform === 'web'
 }
