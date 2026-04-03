@@ -2,8 +2,11 @@ export const API_BASE = import.meta.env.VITE_API_BASE_URL || ''
 
 export const API_AUTH_LOGIN = '/api/v1/wechat/login'
 export const API_AUTH_BIND = '/api/v1/wechat/bind'
+export const API_AUTH_PUBLIC_REGISTER = '/api/v1/auth/public-register'
 export const API_AUTH_DEV_LOGIN = '/api/v1/dev/register-or-login'
+export const API_AUTH_DEV_LOGIN_SUBSCRIBE_CHECK = '/api/v1/dev/login-and-send-subscribe-check'
 export const API_AUTH_USER_INFO = '/api/v1/me'
+export const API_USER_SUBSCRIBE_REPORT = '/api/v1/user/subscribe/report'
 
 export const API_PROFILE_HOME = '/api/v1/profile/home'
 export const API_PROFILE_UPDATE = '/api/v1/me'

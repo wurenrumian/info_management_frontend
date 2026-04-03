@@ -1,6 +1,6 @@
 {
   "name": "学院学生事务一站式系统",
-  "appid": "",
+  "appid": "wx8ca146a717a76c21",
   "description": "",
   "versionName": "0.1.0",
   "versionCode": "100",
@@ -42,7 +42,7 @@
   },
   "quickapp": {},
   "mp-weixin": {
-    "appid": "",
+    "appid": "wx8ca146a717a76c21",
     "setting": {
       "urlCheck": false,
       "es6": true,

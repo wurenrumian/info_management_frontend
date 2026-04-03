@@ -3,9 +3,10 @@ import { getAnnouncements } from './announcements'
 import { getApprovalList, getMyApprovalList } from './approvals'
 import { getUserInfo } from './auth'
 import { searchKnowledge } from './knowledge'
-import { API_PROFILE_HOME, API_NOTIFICATION_UNREAD_COUNT } from '@/constants/api'
+import { API_PROFILE_HOME, API_NOTIFICATION_UNREAD_COUNT, API_USER_SUBSCRIBE_REPORT } from '@/constants/api'
 import type { ProfileHomeViewModel, ProfileHomeApiResponse } from '@/types/profile'
 import type { UserInfo } from '@/types/user'
+import type { NotificationUnreadCount, SubscribeReportRequest, SubscribeReportResult } from '@/types/notification'
 import { UserRole } from '@/constants/enums'
 
 function toRoleText(role: UserRole): string {
@@ -92,6 +93,21 @@ export async function getProfileHomeViewModel(): Promise<ProfileHomeViewModel> {
   } catch {
     return getFallbackViewModel()
   }
+}
+
+export function reportSubscribeResult(payload: SubscribeReportRequest) {
+  return request<SubscribeReportResult>({
+    url: API_USER_SUBSCRIBE_REPORT,
+    method: 'POST',
+    data: payload as unknown as Record<string, unknown>,
+  })
+}
+
+export function getUnreadNotificationCount() {
+  return request<NotificationUnreadCount>({
+    url: API_NOTIFICATION_UNREAD_COUNT,
+    method: 'GET',
+  })
 }
 
 async function getFallbackViewModel(): Promise<ProfileHomeViewModel> {
