@@ -4,12 +4,19 @@ export interface UserInfo {
   id: number
   student_id: string
   name: string
+  real_name?: string
+  nickname?: string
   open_id?: string
   wechat_openid?: string
   role: UserRole
   class_id: number
   grade: string
   major: string
+  college?: string
+  enrollment_year?: number
+  bio?: string
+  avatar_url?: string
+  avatar_file_path?: string
   extra_attrs?: {
     status?: string
     special_identities?: string[]
