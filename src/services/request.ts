@@ -46,7 +46,7 @@ function getToken(): string {
 
 interface RequestOptions {
   url: string
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE'
+  method?: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   data?: Record<string, unknown>
   header?: Record<string, string>
   withAuth?: boolean
@@ -61,7 +61,7 @@ export function request<T>(options: RequestOptions): Promise<T> {
   return new Promise((resolve, reject) => {
     uni.request({
       url: resolveApiUrl(url),
-      method,
+      method: method as unknown as UniApp.RequestOptions['method'],
       data: data as RequestData,
       header: {
         'Content-Type': 'application/json',

@@ -53,3 +53,32 @@ export interface ProfileHomeApiResponse {
     unread_notifications: number
   }
 }
+
+export interface ProfileEditableInfo {
+  id: number
+  student_id: string
+  name?: string
+  real_name?: string
+  nickname?: string
+  role?: number
+  major?: string
+  college?: string
+  enrollment_year?: number
+  bio?: string
+  avatar_url?: string
+  extra_attrs?: {
+    remarks?: string
+  }
+}
+
+export interface UpdateProfilePayload {
+  nickname?: string
+  major?: string
+  college?: string
+  enrollment_year?: number
+  bio?: string
+  avatar_url?: string
+  avatar_file_id?: number
+  avatar_file_path?: string
+  avatar_file_title?: string
+}

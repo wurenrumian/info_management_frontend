@@ -29,8 +29,15 @@
       "style": {
         "navigationBarTitleText": "个人主页"
       }
+    },
+    {
+      "path": "pages/profile/edit",
+      "style": {
+        "navigationBarTitleText": "编辑资料"
+      }
     }
   ],
+  "subPackages": [],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "学院事务",
