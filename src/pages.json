@@ -82,6 +82,12 @@
           "style": {
             "navigationBarTitleText": "文档上传"
           }
+        },
+        {
+          "path": "admin/ai-generate",
+          "style": {
+            "navigationBarTitleText": "AI生成问答"
+          }
         }
       ]
     }

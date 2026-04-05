@@ -58,3 +58,24 @@ export interface BindAttachmentResult {
   already_count: number
   attachments: KnowledgeAttachment[]
 }
+
+export interface QaCountRange {
+  min: number
+  max: number
+}
+
+export interface KnowledgeAIDraftItem {
+  question: string
+  answer: string
+  keywords: string[]
+  attachment_file_ids: number[]
+}
+
+export interface GenerateKnowledgeQaPreviewPayload {
+  file_ids: number[]
+  qa_count_range: QaCountRange
+}
+
+export interface BatchCreateKnowledgePayload {
+  items: KnowledgeAIDraftItem[]
+}

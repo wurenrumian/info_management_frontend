@@ -84,6 +84,13 @@ export function searchFiles(params: { q: string; limit: number; offset: number }
   return requestFileList<SearchFileItem>(API_FILE_SEARCH, params)
 }
 
+export function deleteFile(fileId: number) {
+  return request<{ deleted: boolean }>({
+    url: `${API_FILE_DOWNLOAD}/${fileId}`,
+    method: 'DELETE',
+  })
+}
+
 function requestFileList<T>(url: string, params: Record<string, unknown>) {
   return new Promise<ListResponse<T>>((resolve, reject) => {
     uni.request({
