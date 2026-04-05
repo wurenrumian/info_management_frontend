@@ -180,7 +180,7 @@ async function chooseAvatar() {
 
       try {
         saving.value = true
-        const uploaded = await uploadFile(filePath)
+        const uploaded = await uploadFile(filePath, 'avatar')
         uploadedAvatarFile.value = {
           id: uploaded.id,
           file_path: uploaded.file_path,

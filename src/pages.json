@@ -37,7 +37,55 @@
       }
     }
   ],
-  "subPackages": [],
+  "subPackages": [
+    {
+      "root": "subpackages/knowledge",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "知识库"
+          }
+        },
+        {
+          "path": "detail",
+          "style": {
+            "navigationBarTitleText": "知识详情"
+          }
+        },
+        {
+          "path": "admin/index",
+          "style": {
+            "navigationBarTitleText": "知识库管理"
+          }
+        },
+        {
+          "path": "admin/detail",
+          "style": {
+            "navigationBarTitleText": "管理详情"
+          }
+        },
+        {
+          "path": "admin/form",
+          "style": {
+            "navigationBarTitleText": "编辑知识"
+          }
+        },
+        {
+          "path": "admin/import",
+          "style": {
+            "navigationBarTitleText": "附件管理"
+          }
+        },
+        {
+          "path": "admin/files",
+          "style": {
+            "navigationBarTitleText": "文档上传"
+          }
+        }
+      ]
+    }
+  ],
   "globalStyle": {
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "学院事务",

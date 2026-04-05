@@ -16,6 +16,8 @@ export const API_NOTIFICATION_UNREAD_COUNT = '/api/v1/notifications/unread/count
 export const API_KNOWLEDGE_SEARCH = '/api/v1/knowledge/search'
 export const API_KNOWLEDGE_DETAIL = '/api/v1/knowledge'
 export const API_KNOWLEDGE_LIST = '/api/v1/knowledge'
+export const API_ADMIN_KNOWLEDGE_LIST = '/api/v1/admin/knowledge'
+export const API_ADMIN_KNOWLEDGE_DETAIL = '/api/v1/admin/knowledge'
 
 export const API_ANNOUNCEMENT_LIST = '/api/v1/announcements'
 export const API_ANNOUNCEMENT_DETAIL = '/api/v1/announcements'
@@ -31,3 +33,4 @@ export const API_PARTYFLOW_REMINDERS = '/api/v1/partyflow/reminders'
 
 export const API_FILE_UPLOAD = '/api/v1/files/upload'
 export const API_FILE_DOWNLOAD = '/api/v1/files'
+export const API_FILE_SEARCH = '/api/v1/files/search'
