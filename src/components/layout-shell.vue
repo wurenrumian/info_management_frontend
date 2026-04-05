@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { isH5, isWeixinMiniProgram } from '@/utils/platform'
+import { useUserStore } from '@/stores/user'
+import { getUserInfo } from '@/services/auth'
 
-type NavKey = 'home' | 'profile'
+type NavKey = 'home' | 'knowledge' | 'profile'
 
 const props = defineProps<{
   current: NavKey
 }>()
 
+const userStore = useUserStore()
+
 const navItems: Array<{ key: NavKey; label: string; path: string }> = [
   { key: 'home', label: '首页', path: '/pages/home/index' },
+  { key: 'knowledge', label: '知识库', path: '/subpackages/knowledge/index' },
   { key: 'profile', label: '个人', path: '/pages/profile/index' },
 ]
 
@@ -22,6 +27,28 @@ function goTo(path: string) {
   }
   uni.reLaunch({ url: path })
 }
+
+async function ensureUserInfoLoaded() {
+  if (userStore.userInfo) {
+    return
+  }
+
+  const token = String(uni.getStorageSync('token') || '').trim()
+  if (!token) {
+    return
+  }
+
+  try {
+    const me = await getUserInfo()
+    userStore.setUserInfo(me)
+  } catch {
+    // Ignore here; request layer already handles auth failures globally.
+  }
+}
+
+onMounted(() => {
+  ensureUserInfoLoaded()
+})
 </script>
 
 <template>

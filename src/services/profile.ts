@@ -2,7 +2,7 @@ import { request } from './request'
 import { getAnnouncements } from './announcements'
 import { getApprovalList, getMyApprovalList } from './approvals'
 import { getUserInfo } from './auth'
-import { searchKnowledge } from './knowledge'
+import { getKnowledgeList } from './knowledge'
 import { API_PROFILE_HOME, API_PROFILE_UPDATE, API_AUTH_USER_INFO, API_NOTIFICATION_UNREAD_COUNT, API_USER_SUBSCRIBE_REPORT } from '@/constants/api'
 import type {
   ProfileHomeViewModel,
@@ -137,7 +137,7 @@ async function getFallbackViewModel(): Promise<ProfileHomeViewModel> {
   const [announcementRes, approvalsRes, knowledgeRes, unreadRes] = await Promise.allSettled([
     getAnnouncements({ limit: 10, offset: 0 }),
     getMyApprovalList({ limit: 10, offset: 0 }).catch(() => getApprovalList({ limit: 10, offset: 0 })),
-    searchKnowledge({ limit: 10, offset: 0 }),
+    getKnowledgeList({ limit: 10, offset: 0 }),
     request<{ count: number }>({ url: API_NOTIFICATION_UNREAD_COUNT, method: 'GET' }),
   ])
 
