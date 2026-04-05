@@ -17,6 +17,8 @@ const loading = ref(false)
 const error = ref('')
 
 const hasPermission = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
+const canUseAIGenerate = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.TEACHER)
+const canDeleteKnowledge = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.TEACHER)
 const isEmpty = computed(() => !loading.value && items.value.length === 0 && !error.value)
 const canPrev = computed(() => offset.value > 0)
 const canNext = computed(() => offset.value + LIMIT < total.value)
@@ -85,6 +87,10 @@ function goFileUpload() {
   uni.navigateTo({ url: '/subpackages/knowledge/admin/files' })
 }
 
+function goAIGenerate() {
+  uni.navigateTo({ url: '/subpackages/knowledge/admin/ai-generate' })
+}
+
 function removeItem(id: number) {
   uni.showModal({
     title: '确认删除',
@@ -126,6 +132,7 @@ loadList()
             <button class="btn" @tap="onReset">重置</button>
             <button class="btn" @tap="goCreate">新增</button>
             <button class="btn" @tap="goFileUpload">文档上传</button>
+            <button v-if="canUseAIGenerate" class="btn" @tap="goAIGenerate">AI 生成问答</button>
           </view>
         </view>
 
@@ -146,7 +153,7 @@ loadList()
               <button class="btn" @tap="goDetail(item.id)">详情</button>
               <button class="btn" @tap="goEdit(item.id)">编辑</button>
               <button class="btn" @tap="goAttachment(item.id)">附件</button>
-              <button class="btn danger" @tap="removeItem(item.id)">删除</button>
+              <button v-if="canDeleteKnowledge" class="btn danger" @tap="removeItem(item.id)">删除</button>
             </view>
           </view>
 

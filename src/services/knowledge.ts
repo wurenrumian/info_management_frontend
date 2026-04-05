@@ -1,7 +1,10 @@
 import { request, resolveApiUrl } from './request'
 import type {
   AdminKnowledgeListParams,
+  BatchCreateKnowledgePayload,
   BindAttachmentResult,
+  GenerateKnowledgeQaPreviewPayload,
+  KnowledgeAIDraftItem,
   KnowledgeItem,
   KnowledgeMutationResult,
   KnowledgeSearchParams,
@@ -11,8 +14,10 @@ import type {
 } from '@/types/knowledge'
 import type { ListResponse } from '@/types/api'
 import {
+  API_ADMIN_KNOWLEDGE_BATCH,
   API_ADMIN_KNOWLEDGE_DETAIL,
   API_ADMIN_KNOWLEDGE_LIST,
+  API_ADMIN_KNOWLEDGE_QA_GENERATE_PREVIEW,
   API_KNOWLEDGE_DETAIL,
   API_KNOWLEDGE_LIST,
   API_KNOWLEDGE_SEARCH,
@@ -85,6 +90,49 @@ function requestList<T>(url: string, data?: Record<string, unknown>) {
   })
 }
 
+function requestListWithBody<T>(url: string, method: 'POST', data?: Record<string, unknown>) {
+  return new Promise<ListResponse<T>>((resolve, reject) => {
+    uni.request({
+      url: resolveApiUrl(url),
+      method,
+      data,
+      header: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${uni.getStorageSync('token') || ''}`,
+      },
+      success: (res) => {
+        if (res.statusCode === 401) {
+          uni.removeStorageSync('token')
+          uni.redirectTo({ url: '/pages/auth/login' })
+          reject(new Error('未登录'))
+          return
+        }
+        if (res.statusCode === 403) {
+          reject(new Error('无权限'))
+          return
+        }
+        if (res.statusCode >= 500) {
+          reject(new Error('服务异常'))
+          return
+        }
+
+        const dataPayload = (res.data || {}) as { error?: string }
+        if (dataPayload.error) {
+          reject(new Error(dataPayload.error))
+          return
+        }
+
+        try {
+          resolve(normalizeListResponse<T>(res.data))
+        } catch (e) {
+          reject(e)
+        }
+      },
+      fail: (err) => reject(err),
+    })
+  })
+}
+
 export function searchKnowledge(params: KnowledgeSearchParams) {
   return requestList<KnowledgeItem>(API_KNOWLEDGE_SEARCH, params as unknown as Record<string, unknown>)
 }
@@ -109,6 +157,18 @@ export function getAdminKnowledgeDetail(id: number) {
     url: `${API_ADMIN_KNOWLEDGE_DETAIL}/${id}`,
     method: 'GET',
   })
+}
+
+export function generateKnowledgeQaPreview(payload: GenerateKnowledgeQaPreviewPayload) {
+  return requestListWithBody<KnowledgeAIDraftItem>(
+    API_ADMIN_KNOWLEDGE_QA_GENERATE_PREVIEW,
+    'POST',
+    payload as unknown as Record<string, unknown>,
+  )
+}
+
+export function batchCreateKnowledge(payload: BatchCreateKnowledgePayload) {
+  return requestListWithBody<KnowledgeItem>(API_ADMIN_KNOWLEDGE_BATCH, 'POST', payload as unknown as Record<string, unknown>)
 }
 
 export function createKnowledge(payload: UpsertKnowledgePayload) {

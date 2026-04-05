@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import LayoutShell from '@/components/layout-shell.vue'
-import { getFileList, searchFiles, uploadFile, type SearchFileItem, type UploadedFile } from '@/services/file'
+import { deleteFile, getFileList, searchFiles, uploadFile, type SearchFileItem, type UploadedFile } from '@/services/file'
 import { useUserStore } from '@/stores/user'
 import { UserRole } from '@/constants/enums'
 
@@ -10,6 +10,7 @@ const DOC_EXT = new Set(['pdf', 'doc', 'docx', 'xls', 'xlsx'])
 
 const userStore = useUserStore()
 const hasPermission = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
+const isSuperAdmin = computed(() => Number(userStore.userInfo?.role || 0) === UserRole.SUPER_ADMIN)
 
 const loading = ref(true)
 const uploading = ref(false)
@@ -120,6 +121,32 @@ async function runSearch() {
   }
 }
 
+function removeFileItem(file: UploadedFile | SearchFileItem) {
+  if (!isSuperAdmin.value) {
+    return
+  }
+
+  uni.showModal({
+    title: '确认删除文档',
+    content: `将删除文档「${file.title || `ID ${file.id}`}」，是否继续？`,
+    success: async (res) => {
+      if (!res.confirm) {
+        return
+      }
+
+      try {
+        await deleteFile(file.id)
+        files.value = files.value.filter((item) => item.id !== file.id)
+        searchResults.value = searchResults.value.filter((item) => item.id !== file.id)
+        searchTotal.value = Math.max(0, searchTotal.value - 1)
+        uni.showToast({ title: '删除成功', icon: 'success' })
+      } catch (e) {
+        uni.showToast({ title: e instanceof Error ? e.message : '删除失败', icon: 'none' })
+      }
+    },
+  })
+}
+
 loadFiles()
 </script>
 
@@ -152,6 +179,7 @@ loadFiles()
                 <text class="name">{{ file.title }}</text>
                 <text class="meta">ID {{ file.id }} · {{ file.content_type || '-' }}</text>
                 <text v-if="file.snippet" class="snippet">{{ file.snippet }}</text>
+                <button v-if="isSuperAdmin" class="btn danger" @tap="removeFileItem(file)">删除文档</button>
               </view>
             </view>
             <text v-else class="desc">没有检索到结果</text>
@@ -173,6 +201,7 @@ loadFiles()
             <view v-for="file in files" :key="file.id" class="row">
               <text class="name">{{ file.title }}</text>
               <text class="meta">ID {{ file.id }} · {{ file.content_type || '-' }}</text>
+              <button v-if="isSuperAdmin" class="btn danger" @tap="removeFileItem(file)">删除文档</button>
             </view>
           </view>
           <text v-else class="desc">暂无文档</text>
