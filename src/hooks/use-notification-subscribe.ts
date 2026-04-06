@@ -234,14 +234,14 @@ export function useNotificationSubscribe() {
           thing1: { value: '微信小程序登录' },
           time2: { value: formatWechatDateTime(new Date()) },
           character_string3: { value: '127.0.0.1' },
-          thing4: { value: `${currentUser.name}(${currentUser.student_id})` },
+          thing4: { value: `${currentUser.real_name || ''}(${currentUser.student_id || ''})`.slice(0, 20) },
         },
       })
 
       const countText =
         typeof result.granted_count === 'number' &&
-        typeof result.consumed_count === 'number' &&
-        typeof result.remaining_count === 'number'
+          typeof result.consumed_count === 'number' &&
+          typeof result.remaining_count === 'number'
           ? `（累计授权 ${result.granted_count}，累计消耗 ${result.consumed_count}，剩余 ${result.remaining_count}）`
           : ''
 
