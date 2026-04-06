@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import LayoutShell from '@/components/layout-shell.vue'
+import SubscribePanel from '@/components/notification/SubscribePanel.vue'
 
 function goToStyleShowcase() {
   uni.navigateTo({
@@ -20,6 +21,7 @@ function goToProfile() {
       <view class="hero-card">
         <text class="hero-title">学院事务一站式系统</text>
         <text class="hero-subtitle">通知、审批与流程统一入口</text>
+        <subscribe-panel />
         <view class="button-row">
           <button class="preview-button" @tap="goToProfile">
             前往个人主页
@@ -73,6 +75,7 @@ function goToProfile() {
 }
 
 .button-row {
+  margin-top: var(--space-2);
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);

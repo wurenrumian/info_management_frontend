@@ -81,7 +81,7 @@ async function persistAuth(auth: AuthToken) {
   } catch {
     userStore.setUserInfo(auth.user)
   }
-  uni.reLaunch({ url: '/pages/profile/index' })
+  uni.reLaunch({ url: '/pages/home/index' })
 }
 
 async function handleWechatLogin() {

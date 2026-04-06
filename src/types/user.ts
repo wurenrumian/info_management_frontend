@@ -61,10 +61,13 @@ export interface DevLoginSubscribeCheckUser {
 }
 
 export interface DevLoginSubscribeCheckResult {
-  token: string
-  user: DevLoginSubscribeCheckUser
+  token?: string
+  user?: DevLoginSubscribeCheckUser
   template_code: string
   subscription_status: string
+  granted_count?: number
+  consumed_count?: number
+  remaining_count?: number
   send_ok: boolean
   send_error: string
 }

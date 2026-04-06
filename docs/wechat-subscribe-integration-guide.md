@@ -34,6 +34,13 @@ sequenceDiagram
 
 前端调用 `uni.requestSubscribeMessage`（微信原生是 `wx.requestSubscribeMessage`），让用户在微信弹窗中选择是否接受订阅。
 
+当前项目约定：
+
+- 首页固定展示“通知订阅面板”
+- 由用户点击“一键订阅通知（3项）”后触发
+- 不在页面打开时自动拉起系统订阅弹窗
+- 一次请求只传 3 个固定模板 id（写死在 `src/constants/notification.ts`）
+
 用户选择结果由微信返回给前端（如 `accept` / `reject` / `ban` / `filter`）。
 
 ### 步骤 B：前端上报订阅结果
@@ -42,6 +49,7 @@ sequenceDiagram
 
 - `POST /api/v1/user/subscribe/report`
 - 参数：`template_code`、`wechat_template_id`、`status`
+- 响应除 `ok` 外，还会返回订阅次数信息：`granted_count`、`consumed_count`、`remaining_count`
 
 这一步只记录用户授权状态，不负责发送消息。
 
