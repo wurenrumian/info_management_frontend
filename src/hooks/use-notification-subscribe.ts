@@ -68,6 +68,15 @@ function mapErrorMessage(error: SubscribeError): string {
   return error.errMsg || '订阅请求失败，请稍后重试'
 }
 
+function formatWechatDateTime(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  const hour = String(date.getHours()).padStart(2, '0')
+  const minute = String(date.getMinutes()).padStart(2, '0')
+  return `${year}-${month}-${day} ${hour}:${minute}`
+}
+
 function hasPlaceholderTemplateConfig(): boolean {
   return SUBSCRIBE_TEMPLATES.some(
     (item) => item.template_code.includes('TODO_') || item.wechat_template_id.includes('TODO_')
@@ -223,7 +232,7 @@ export function useNotificationSubscribe() {
         page: '/pages/home/index',
         template_data: {
           thing1: { value: '微信小程序登录' },
-          time2: { value: new Date().toLocaleString('zh-CN', { hour12: false }) },
+          time2: { value: formatWechatDateTime(new Date()) },
           character_string3: { value: '127.0.0.1' },
           thing4: { value: `${currentUser.name}(${currentUser.student_id})` },
         },
