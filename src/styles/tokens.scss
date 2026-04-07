@@ -1,15 +1,16 @@
 :root,
 page {
-  --color-primary: #9d2933;
-  --color-primary-soft: #f6e9ea;
-  --color-bg: #f7f4f1;
+  --color-primary: #b21f2d;
+  --color-primary-soft: #f3e3e5;
+  --color-bg: #f6f3f0;
   --color-surface: #ffffff;
   --color-text: #2b2b2b;
-  --color-text-secondary: #6b7280;
-  --color-border: #e7e2dd;
-  --color-success: #2f7d4a;
-  --color-warning: #b7791f;
-  --color-danger: #c53b3b;
+  --color-text-secondary: #6b6763;
+  --color-border: #e4dfda;
+  --color-success: #48a9a6;
+  --color-warning: #d4b483;
+  --color-danger: #b21f2d;
+  --color-info: #4281a4;
 
   --font-size-xs: 12px;
   --font-size-sm: 14px;
@@ -26,12 +27,15 @@ page {
   --space-3: 16px;
   --space-4: 24px;
   --space-5: 32px;
+  --space-6: 40px;
 
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
 
   --shadow-card: 0 6px 20px rgba(43, 43, 43, 0.06);
+  --content-max-width: 1120px;
+  --content-narrow-width: 760px;
 
   --z-base: 1;
   --z-fixed: 100;

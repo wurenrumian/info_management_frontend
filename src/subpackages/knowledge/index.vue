@@ -116,52 +116,47 @@ function openFile(url?: string) {
 
 <template>
   <layout-shell current="knowledge">
-    <view class="knowledge-page">
-      <view class="card search-card">
+    <view class="knowledge-page page-container">
+      <content-panel class="search-card" title="知识检索" :sub-title="searchSubtitle">
+        <template #default>
         <view class="mode-row">
-          <button class="mode-btn" :class="{ 'mode-btn--active': mode === 'knowledge' }" @tap="switchMode('knowledge')">问答搜索</button>
-          <button class="mode-btn" :class="{ 'mode-btn--active': mode === 'file' }" @tap="switchMode('file')">文档搜索</button>
+          <nut-button :type="mode === 'knowledge' ? 'primary' : 'default'" size="small" @click="switchMode('knowledge')">问答搜索</nut-button>
+          <nut-button :type="mode === 'file' ? 'primary' : 'default'" size="small" @click="switchMode('file')">文档搜索</nut-button>
         </view>
-        <text class="title">{{ searchTitle }}</text>
-        <text class="subtitle">{{ searchSubtitle }}</text>
         <view class="search-row">
-          <input v-model="keyword" class="input" placeholder="例如：休学、奖学金、补办证明" confirm-type="search" @confirm="runSearch(false)" />
-          <button class="btn primary" :loading="loading" @tap="runSearch(false)">搜索</button>
+          <nut-input v-model="keyword" placeholder="例如：休学、奖学金、补办证明" @confirm="runSearch(false)" />
+          <nut-button type="primary" :loading="loading" @click="runSearch(false)">搜索</nut-button>
         </view>
-      </view>
+        </template>
+      </content-panel>
 
-      <view v-if="canManage" class="card admin-entry" @tap="goAdmin">
-        <text class="title">知识库管理</text>
-        <text class="subtitle">新增、编辑、删除与导入知识条目</text>
-      </view>
+      <nut-cell v-if="canManage" title="知识库管理" desc="新增、编辑、删除与导入知识条目" icon="setting" is-link @click="goAdmin" />
 
-      <view v-if="error" class="card state-card state-card--error">
-        <text class="state-title">搜索失败</text>
-        <text class="state-desc">{{ error }}</text>
-      </view>
+      <nut-noticebar v-if="error" wrapable color="danger" :text="`搜索失败：${error}`" />
 
-      <view v-else-if="isEmpty" class="card state-card">
-        <text class="state-title">暂无匹配结果</text>
-        <text class="state-desc">可以尝试更短的关键词，或联系老师获取进一步指引</text>
-      </view>
+      <nut-empty v-else-if="isEmpty" image="empty" description="暂无匹配结果，可尝试更短关键词" />
 
       <view v-else-if="knowledgeItems.length > 0 && mode === 'knowledge'" class="list-wrap">
-        <view v-for="item in knowledgeItems" :key="item.id" class="card item-card" @tap="goDetail(item.id)">
-          <text class="item-title">{{ item.question }}</text>
-          <text class="item-meta">关键词：{{ (item.keywords || []).join(' / ') || '无' }}</text>
-          <text class="item-meta">更新时间：{{ item.updated_at || '-' }}</text>
-        </view>
-        <button v-if="hasMore" class="btn" :loading="loading" @tap="runSearch(true)">加载更多</button>
+        <content-panel v-for="item in knowledgeItems" :key="item.id" class="item-card" @click="goDetail(item.id)">
+          <template #default>
+            <text class="item-title">{{ item.question }}</text>
+            <text class="item-meta">关键词：{{ (item.keywords || []).join(' / ') || '无' }}</text>
+            <text class="item-meta">更新时间：{{ item.updated_at || '-' }}</text>
+          </template>
+        </content-panel>
+        <nut-button v-if="hasMore" plain :loading="loading" @click="runSearch(true)">加载更多</nut-button>
       </view>
 
       <view v-else-if="fileItems.length > 0 && mode === 'file'" class="list-wrap">
-        <view v-for="item in fileItems" :key="`file-${item.id}`" class="card item-card">
-          <text class="item-title">{{ item.title }}</text>
-          <text class="item-meta">文件ID：{{ item.id }} · {{ item.content_type || '-' }}</text>
-          <text v-if="item.snippet" class="item-meta">{{ item.snippet }}</text>
-          <button class="btn" @tap="openFile(item.url || item.file_path)">打开文档</button>
-        </view>
-        <button v-if="hasMore" class="btn" :loading="loading" @tap="runSearch(true)">加载更多</button>
+        <content-panel v-for="item in fileItems" :key="`file-${item.id}`" class="item-card">
+          <template #default>
+            <text class="item-title">{{ item.title }}</text>
+            <text class="item-meta">文件ID：{{ item.id }} · {{ item.content_type || '-' }}</text>
+            <text v-if="item.snippet" class="item-meta">{{ item.snippet }}</text>
+            <nut-button plain @click="openFile(item.url || item.file_path)">打开文档</nut-button>
+          </template>
+        </content-panel>
+        <nut-button v-if="hasMore" plain :loading="loading" @click="runSearch(true)">加载更多</nut-button>
       </view>
     </view>
   </layout-shell>
@@ -169,71 +164,20 @@ function openFile(url?: string) {
 
 <style scoped lang="scss">
 .knowledge-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .search-row {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-3);
+  align-items: center;
 }
 
 .mode-row {
   display: flex;
   gap: var(--space-2);
   margin-bottom: var(--space-2);
-}
-
-.mode-btn {
-  margin: 0;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  background: #fff;
-  color: var(--color-text-secondary);
-}
-
-.mode-btn--active {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-}
-
-.input {
-  flex: 1;
-  height: 40px;
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: #fff;
-}
-
-.title {
-  display: block;
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-}
-
-.subtitle,
-.item-meta,
-.state-desc {
-  display: block;
-  margin-top: var(--space-1);
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.admin-entry {
-  border-color: var(--color-primary);
 }
 
 .list-wrap {
@@ -246,26 +190,20 @@ function openFile(url?: string) {
   cursor: pointer;
 }
 
-.item-title,
-.state-title {
+.item-title {
   display: block;
   font-size: var(--font-size-md);
   font-weight: var(--font-weight-medium);
 }
 
-.btn {
-  border-radius: var(--radius-md);
-  background: #fff;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
+.item-meta {
+  display: block;
+  margin-top: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.state-card--error {
-  border-color: #f3c2c2;
+:deep(.nut-input) {
+  flex: 1;
 }
 </style>

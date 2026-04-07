@@ -160,39 +160,37 @@ onLoad((query) => {
 
 <template>
   <layout-shell current="knowledge">
-    <view class="bind-page">
-      <view v-if="!hasPermission" class="card state-card state-card--error">
-        <text class="title">无权限访问</text>
-      </view>
+    <view class="bind-page page-container">
+      <content-panel v-if="!hasPermission" title="无权限访问" />
 
-      <view v-else-if="loading" class="card state-card">
-        <text>加载中...</text>
-      </view>
+      <content-panel v-else-if="loading" title="附件管理">
+        <template #default>
+          <nut-empty image="empty" description="加载中..." />
+        </template>
+      </content-panel>
 
-      <view v-else-if="error" class="card state-card state-card--error">
-        <text class="title">加载失败</text>
-        <text class="desc">{{ error }}</text>
-      </view>
+      <nut-noticebar v-else-if="error" color="danger" wrapable :text="error" />
 
       <template v-else>
-        <view class="card">
-          <text class="title">当前已绑定附件</text>
+        <content-panel title="当前已绑定附件">
+          <template #default>
           <view v-if="boundAttachments.length > 0" class="list">
             <view v-for="item in boundAttachments" :key="`${item.file_id}-${item.title}`" class="row">
               <view class="col">
                 <text class="name">{{ item.title }}</text>
                 <text class="meta">file_id: {{ item.file_id || '-' }}</text>
               </view>
-              <button class="btn danger" @tap="detachOne(item.file_id)">解绑</button>
+              <nut-button type="danger" size="small" @click="detachOne(item.file_id)">解绑</nut-button>
             </view>
           </view>
           <text v-else class="meta">暂无绑定附件</text>
-        </view>
+          </template>
+        </content-panel>
 
-        <view class="card">
-          <text class="title">从已上传文件中选择并绑定</text>
+        <content-panel title="从已上传文件中选择并绑定">
+          <template #default>
           <text class="meta">仅展示最近 {{ LIMIT }} 条上传记录</text>
-          <button class="btn" :loading="uploading" @tap="uploadAndRefresh">上传新文件</button>
+          <nut-button plain :loading="uploading" @click="uploadAndRefresh">上传新文件</nut-button>
           <view v-if="uploadedFiles.length > 0" class="list">
             <view
               v-for="file in uploadedFiles"
@@ -205,13 +203,14 @@ onLoad((query) => {
                 <text class="name">{{ file.title }}</text>
                 <text class="meta">ID {{ file.id }} · {{ file.content_type || '-' }}</text>
               </view>
-              <text class="meta">{{ selectedIds.includes(file.id) ? '已选择' : '点击选择' }}</text>
+              <nut-tag :type="selectedIds.includes(file.id) ? 'primary' : 'default'">{{ selectedIds.includes(file.id) ? '已选择' : '点击选择' }}</nut-tag>
             </view>
           </view>
           <text v-else class="meta">暂无可绑定文件，请先在文件模块上传</text>
 
-          <button class="btn primary" :loading="saving" @tap="bindSelected">绑定所选文件</button>
-        </view>
+          <nut-button type="primary" block :loading="saving" @click="bindSelected">绑定所选文件</nut-button>
+          </template>
+        </content-panel>
       </template>
     </view>
   </layout-shell>
@@ -219,17 +218,7 @@ onLoad((query) => {
 
 <style scoped lang="scss">
 .bind-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .title {
@@ -279,26 +268,4 @@ onLoad((query) => {
   display: block;
 }
 
-.btn {
-  margin: 0;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background: #fff;
-}
-
-.btn.primary {
-  margin-top: var(--space-3);
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.btn.danger {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-}
-
-.state-card--error {
-  border-color: #f3c2c2;
-}
 </style>

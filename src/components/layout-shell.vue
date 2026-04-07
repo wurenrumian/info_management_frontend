@@ -12,10 +12,10 @@ const props = defineProps<{
 
 const userStore = useUserStore()
 
-const navItems: Array<{ key: NavKey; label: string; path: string }> = [
-  { key: 'home', label: '首页', path: '/pages/home/index' },
-  { key: 'knowledge', label: '知识库', path: '/subpackages/knowledge/index' },
-  { key: 'profile', label: '个人', path: '/pages/profile/index' },
+const navItems: Array<{ key: NavKey; label: string; path: string; icon: string }> = [
+  { key: 'home', label: '首页', path: '/pages/home/index', icon: 'home' },
+  { key: 'knowledge', label: '知识库', path: '/subpackages/knowledge/index', icon: 'category' },
+  { key: 'profile', label: '个人', path: '/pages/profile/index', icon: 'my' },
 ]
 
 const showSidebar = computed(() => isH5())
@@ -62,7 +62,8 @@ onMounted(() => {
         :class="{ 'nav-item--active': props.current === item.key }"
         @tap="goTo(item.path)"
       >
-        {{ item.label }}
+        <nut-icon :name="item.icon" size="14" />
+        <text>{{ item.label }}</text>
       </view>
     </view>
 
@@ -78,7 +79,8 @@ onMounted(() => {
         :class="{ 'bottom-nav-item--active': props.current === item.key }"
         @tap="goTo(item.path)"
       >
-        {{ item.label }}
+        <nut-icon :name="item.icon" size="14" />
+        <text>{{ item.label }}</text>
       </view>
     </view>
   </view>
@@ -95,11 +97,12 @@ onMounted(() => {
 }
 
 .sidebar {
-  width: 220px;
+  width: 240px;
   min-height: 100vh;
   padding: var(--space-4);
   border-right: 1px solid var(--color-border);
   background: var(--color-surface);
+  box-shadow: 8px 0 24px rgba(43, 43, 43, 0.04);
 }
 
 .sidebar-title {
@@ -110,9 +113,13 @@ onMounted(() => {
 }
 
 .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   color: var(--color-text-secondary);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .nav-item + .nav-item {
@@ -130,7 +137,9 @@ onMounted(() => {
 
 .layout-shell--h5 .content {
   flex: 1;
-  max-width: 980px;
+  min-width: 0;
+  max-width: none;
+  padding: var(--space-5) var(--space-6);
 }
 
 .content--with-bottom-nav {
@@ -152,6 +161,8 @@ onMounted(() => {
 .bottom-nav-item {
   flex: 1;
   display: flex;
+  flex-direction: column;
+  gap: 2px;
   align-items: center;
   justify-content: center;
   color: var(--color-text-secondary);
@@ -161,5 +172,31 @@ onMounted(() => {
 .bottom-nav-item--active {
   color: var(--color-primary);
   font-weight: var(--font-weight-medium);
+}
+
+@media (min-width: 1024px) {
+  .sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    padding: 28px 20px;
+  }
+
+  .sidebar-title {
+    margin-bottom: var(--space-5);
+    font-size: 20px;
+  }
+
+  .nav-item {
+    min-height: 44px;
+    font-size: var(--font-size-sm);
+  }
+
+  .layout-shell--h5 .content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 36px 40px 48px;
+  }
 }
 </style>

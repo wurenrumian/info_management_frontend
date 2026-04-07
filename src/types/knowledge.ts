@@ -67,7 +67,7 @@ export interface QaCountRange {
 export interface KnowledgeAIDraftItem {
   question: string
   answer: string
-  keywords: string[]
+  keywords?: string[]
   attachment_file_ids: number[]
 }
 

@@ -96,60 +96,79 @@ onMounted(() => {
 
 <template>
   <layout-shell current="profile">
-    <view class="profile-page">
-      <view v-if="loading" class="state-card">
-        <text>个人主页加载中...</text>
-      </view>
+    <view class="profile-page page-container">
+      <content-panel v-if="loading" title="个人主页">
+        <template #default>
+          <nut-empty image="empty" description="个人主页加载中..." />
+        </template>
+      </content-panel>
 
-      <view v-else-if="error" class="state-card state-card--error">
-        <text class="state-title">加载失败</text>
-        <text class="state-desc">{{ error }}</text>
-        <button class="btn primary" @tap="loadProfile">重试</button>
-      </view>
+      <content-panel v-else-if="error" title="加载失败">
+        <template #default>
+          <nut-noticebar wrapable color="danger" :text="error" />
+          <nut-button type="primary" block @click="loadProfile">重试</nut-button>
+        </template>
+      </content-panel>
 
       <view v-else-if="profile" class="profile-grid">
-        <view class="profile-card profile-card--hero">
-          <view class="hero-row">
-            <image v-if="avatarUrl" class="hero-avatar" :src="avatarUrl" mode="aspectFill" />
-            <view v-else class="hero-avatar hero-avatar--placeholder">头像</view>
-            <view class="hero-content">
-              <text class="hero-name">{{ displayName }}</text>
-              <text class="hero-meta">实名：{{ realNameText }}</text>
-              <text class="hero-meta">学号 {{ profile.basic.studentId }} · {{ profile.basic.roleText }}</text>
+        <content-panel class="profile-card--hero" title="个人主页" sub-title="信息概览与快捷操作">
+          <template #default>
+            <view class="hero-row">
+              <image v-if="avatarUrl" class="hero-avatar" :src="avatarUrl" mode="aspectFill" />
+              <view v-else class="hero-avatar hero-avatar--placeholder">头像</view>
+              <view class="hero-content">
+                <text class="hero-name">{{ displayName }}</text>
+                <text class="hero-meta">实名：{{ realNameText }}</text>
+                <text class="hero-meta">学号 {{ profile.basic.studentId }} · {{ profile.basic.roleText }}</text>
+              </view>
             </view>
-          </view>
-          <text class="hero-bio">{{ bioText }}</text>
-          <button class="btn primary" @tap="goEditPage">编辑资料</button>
-        </view>
+            <text class="hero-bio">{{ bioText }}</text>
+            <nut-button type="primary" block @click="goEditPage">编辑资料</nut-button>
+          </template>
+        </content-panel>
 
-        <view class="profile-card">
-          <text class="card-title">学业信息</text>
-          <text class="row"><text class="label">学院：</text>{{ collegeText }}</text>
-          <text class="row"><text class="label">专业：</text>{{ majorText }}</text>
-          <text class="row"><text class="label">入学学年：</text>{{ enrollmentYearText }}</text>
-          <text class="row"><text class="label">班级ID：</text>{{ profile.basic.classId || 0 }}</text>
-        </view>
+        <content-panel title="学业信息">
+          <template #default>
+            <nut-cell title="学院" :desc="collegeText" />
+            <nut-cell title="专业" :desc="majorText" />
+            <nut-cell title="入学学年" :desc="enrollmentYearText" />
+            <nut-cell title="班级ID" :desc="String(profile.basic.classId || 0)" />
+          </template>
+        </content-panel>
 
-        <view class="profile-card">
-          <text class="card-title">账号状态</text>
-          <text class="row"><text class="label">登录状态：</text>{{ profile.account.hasToken ? '已登录' : '未登录' }}</text>
-          <text class="row"><text class="label">微信绑定：</text>{{ profile.account.wechatBound ? '已绑定' : '未绑定' }}</text>
-        </view>
+        <content-panel title="账号状态">
+          <template #default>
+            <view class="status-list">
+              <view class="status-item">
+                <text class="status-label">登录状态</text>
+                <nut-tag type="success">{{ profile.account.hasToken ? '已登录' : '未登录' }}</nut-tag>
+              </view>
+              <view class="status-item">
+                <text class="status-label">微信绑定</text>
+                <nut-tag type="warning">{{ profile.account.wechatBound ? '微信已绑定' : '微信未绑定' }}</nut-tag>
+              </view>
+            </view>
+          </template>
+        </content-panel>
 
-        <view class="profile-card">
-          <text class="card-title">我的数据</text>
-          <text class="row"><text class="label">公告：</text>{{ profile.quickEntry.announcementsCount }}</text>
-          <text class="row"><text class="label">审批：</text>{{ profile.quickEntry.approvalsCount }}</text>
-          <text class="row"><text class="label">知识库：</text>{{ profile.quickEntry.knowledgeCount }}</text>
-          <text class="row"><text class="label">未读通知：</text>{{ profile.quickEntry.unreadNotifications }}</text>
-        </view>
+        <content-panel title="我的数据">
+          <template #default>
+            <nut-cell title="公告" :desc="String(profile.quickEntry.announcementsCount)" icon="message" />
+            <nut-cell title="审批" :desc="String(profile.quickEntry.approvalsCount)" icon="checked" />
+            <nut-cell title="知识库" :desc="String(profile.quickEntry.knowledgeCount)" icon="category" />
+            <nut-cell title="未读通知" :desc="String(profile.quickEntry.unreadNotifications)" icon="notice" />
+          </template>
+        </content-panel>
 
-        <view class="profile-card">
-          <text class="card-title">账号操作</text>
-          <button class="btn" @tap="loadProfile">刷新数据</button>
-          <button class="btn" @tap="goHome">返回首页</button>
-          <button class="btn danger" @tap="handleLogout">退出登录</button>
-        </view>
+        <content-panel title="账号操作">
+          <template #default>
+            <view class="action-group">
+              <nut-button plain @click="loadProfile">刷新数据</nut-button>
+              <nut-button plain @click="goHome">返回首页</nut-button>
+              <nut-button type="danger" @click="handleLogout">退出登录</nut-button>
+            </view>
+          </template>
+        </content-panel>
       </view>
     </view>
   </layout-shell>
@@ -166,15 +185,6 @@ onMounted(() => {
   display: grid;
   gap: var(--space-3);
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-.profile-card,
-.state-card {
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
 }
 
 .profile-card--hero {
@@ -204,6 +214,7 @@ onMounted(() => {
 
 .hero-content {
   flex: 1;
+  min-width: 0;
 }
 
 .hero-name {
@@ -223,48 +234,71 @@ onMounted(() => {
   margin-top: var(--space-3);
 }
 
-.state-card--error {
-  border-color: #f0c5c5;
+.status-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
-.card-title,
-.state-title {
-  display: block;
-  margin-bottom: var(--space-3);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-}
-
-.state-desc {
-  display: block;
-  margin-bottom: var(--space-2);
-  color: var(--color-text-secondary);
-}
-
-.row {
-  display: block;
-  margin-top: var(--space-1);
-}
-
-.label {
-  color: var(--color-text-secondary);
-}
-
-.btn {
-  margin-top: var(--space-2);
-  background: #fff;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
+.status-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  padding: 10px 12px;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.72);
 }
 
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
+.status-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
 }
 
-.btn.danger {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
+:deep(.nut-tag) {
+  margin: 0;
+}
+
+@media (min-width: 1024px) {
+  .profile-grid {
+    grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+    gap: var(--space-4);
+  }
+
+  .profile-card--hero {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+  }
+
+  .hero-row {
+    align-items: flex-start;
+    gap: var(--space-4);
+  }
+
+  .hero-avatar {
+    width: 92px;
+    height: 92px;
+  }
+
+  .hero-name {
+    font-size: 28px;
+    line-height: 1.3;
+  }
+
+  .hero-meta,
+  .hero-bio {
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .status-item {
+    padding: 12px 14px;
+  }
+
+  .status-label {
+    font-size: 15px;
+  }
 }
 </style>

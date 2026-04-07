@@ -66,17 +66,21 @@ onLoad((query) => {
 
 <template>
   <layout-shell current="knowledge">
-    <view class="detail-page">
-      <view v-if="loading" class="card state-card">
-        <text>加载中...</text>
-      </view>
+    <view class="detail-page page-container">
+      <content-panel v-if="loading" title="知识详情">
+        <template #default>
+          <nut-empty image="empty" description="加载中..." />
+        </template>
+      </content-panel>
 
-      <view v-else-if="error" class="card state-card state-card--error">
-        <text class="title">加载失败</text>
-        <text class="desc">{{ error }}</text>
-      </view>
+      <content-panel v-else-if="error" title="加载失败">
+        <template #default>
+          <nut-noticebar wrapable color="danger" :text="error" />
+        </template>
+      </content-panel>
 
-      <view v-else-if="detail" class="card content-card">
+      <content-panel v-else-if="detail" :title="detail.question" sub-title="知识问答详情">
+        <template #default>
         <text class="title">{{ detail.question }}</text>
         <text class="desc">{{ detail.answer }}</text>
 
@@ -90,30 +94,22 @@ onLoad((query) => {
           <view v-if="(detail.attachments || []).length > 0" class="attachment-list">
             <view v-for="(attachment, index) in detail.attachments" :key="`${attachment.title}-${index}`" class="attachment-item">
               <text class="attachment-title">{{ attachment.title }}</text>
-              <button class="btn" :disabled="!attachment.url" @tap="openAttachment(attachment.url)">
+              <nut-button plain :disabled="!attachment.url" @click="openAttachment(attachment.url)">
                 {{ attachment.url ? '打开附件' : '暂无链接' }}
-              </button>
+              </nut-button>
             </view>
           </view>
           <text v-else class="desc">无附件</text>
         </view>
-      </view>
+        </template>
+      </content-panel>
     </view>
   </layout-shell>
 </template>
 
 <style scoped lang="scss">
 .detail-page {
-  display: flex;
-  flex-direction: column;
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .title {
@@ -157,15 +153,7 @@ onLoad((query) => {
   flex: 1;
 }
 
-.btn {
+:deep(.nut-button) {
   margin: 0;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background: #fff;
-  border-radius: var(--radius-md);
-}
-
-.state-card--error {
-  border-color: #f3c2c2;
 }
 </style>

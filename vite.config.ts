@@ -7,6 +7,15 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [uni()],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@use "nutui-uniapp/styles/variables.scss" as *;`,
+          quietDeps: true,
+          silenceDeprecations: ['legacy-js-api', 'import'],
+        },
+      },
+    },
     resolve: {
       alias: {
         '@': '/src',

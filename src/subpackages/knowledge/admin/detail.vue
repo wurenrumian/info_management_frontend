@@ -62,48 +62,39 @@ onLoad((query) => {
 
 <template>
   <layout-shell current="knowledge">
-    <view class="detail-page">
-      <view v-if="!hasPermission" class="card state-card state-card--error">
-        <text class="title">无权限访问</text>
-      </view>
+    <view class="detail-page page-container">
+      <content-panel v-if="!hasPermission" title="无权限访问" />
 
-      <view v-else-if="loading" class="card state-card">
-        <text>加载中...</text>
-      </view>
+      <content-panel v-else-if="loading" title="管理详情">
+        <template #default>
+          <nut-empty image="empty" description="加载中..." />
+        </template>
+      </content-panel>
 
-      <view v-else-if="error" class="card state-card state-card--error">
-        <text class="title">加载失败</text>
-        <text class="desc">{{ error }}</text>
-      </view>
+      <nut-noticebar v-else-if="error" color="danger" wrapable :text="error" />
 
-      <view v-else-if="detail" class="card content-card">
-        <text class="title">{{ detail.question }}</text>
-        <text class="row"><text class="label">答案：</text>{{ detail.answer }}</text>
-        <text class="row"><text class="label">关键词：</text>{{ (detail.keywords || []).join(' / ') || '无' }}</text>
-        <text class="row"><text class="label">附件：</text>{{ attachments.map((item) => item.title).join('、') || '无' }}</text>
-        <text class="row"><text class="label">创建人：</text>{{ detail.created_by }}</text>
-        <text class="row"><text class="label">更新人：</text>{{ detail.updated_by || '-' }}</text>
-        <text class="row"><text class="label">创建时间：</text>{{ detail.created_at || '-' }}</text>
-        <text class="row"><text class="label">更新时间：</text>{{ detail.updated_at || '-' }}</text>
-        <button class="btn" @tap="goEdit">编辑条目</button>
-        <button class="btn" @tap="goAttachmentManage">管理附件</button>
-      </view>
+      <content-panel v-else-if="detail" :title="detail.question" sub-title="管理详情">
+        <template #default>
+          <nut-cell title="答案" :desc="detail.answer" />
+          <nut-cell title="关键词" :desc="(detail.keywords || []).join(' / ') || '无'" />
+          <nut-cell title="附件" :desc="attachments.map((item) => item.title).join('、') || '无'" />
+          <nut-cell title="创建人" :desc="String(detail.created_by)" />
+          <nut-cell title="更新人" :desc="String(detail.updated_by || '-')" />
+          <nut-cell title="创建时间" :desc="String(detail.created_at || '-')" />
+          <nut-cell title="更新时间" :desc="String(detail.updated_at || '-')" />
+          <view class="action-group">
+            <nut-button plain @click="goEdit">编辑条目</nut-button>
+            <nut-button plain @click="goAttachmentManage">管理附件</nut-button>
+          </view>
+        </template>
+      </content-panel>
     </view>
   </layout-shell>
 </template>
 
 <style scoped lang="scss">
 .detail-page {
-  display: flex;
-  flex-direction: column;
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .title {
@@ -112,26 +103,4 @@ onLoad((query) => {
   font-weight: var(--font-weight-semibold);
 }
 
-.row {
-  display: block;
-  margin-top: var(--space-2);
-  white-space: pre-wrap;
-}
-
-.label,
-.desc {
-  color: var(--color-text-secondary);
-}
-
-.btn {
-  margin-top: var(--space-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background: #fff;
-}
-
-.state-card--error {
-  border-color: #f3c2c2;
-}
 </style>

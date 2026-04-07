@@ -262,92 +262,68 @@ onMounted(() => {
 </script>
 
 <template>
-  <view class="edit-page">
-    <view v-if="loading" class="state-card">
-      <text>资料加载中...</text>
-    </view>
+  <view class="edit-page page-container">
+    <content-panel v-if="loading" title="编辑资料">
+      <template #default>
+        <nut-empty image="empty" description="资料加载中..." />
+      </template>
+    </content-panel>
 
-    <view v-else-if="error" class="state-card state-card--error">
-      <text class="state-title">加载失败</text>
-      <text class="state-desc">{{ error }}</text>
-      <button class="btn primary" @tap="loadEditableInfo">重试</button>
-    </view>
+    <content-panel v-else-if="error" title="加载失败">
+      <template #default>
+        <nut-noticebar wrapable color="danger" :text="error" />
+        <nut-button type="primary" block @click="loadEditableInfo">重试</nut-button>
+      </template>
+    </content-panel>
 
-    <view v-else class="edit-card">
-      <text class="title">编辑个人资料</text>
+    <content-panel v-else title="编辑个人资料">
+      <template #default>
+        <view class="avatar-row">
+          <image v-if="avatarPreview" class="avatar" :src="avatarPreview" mode="aspectFill" />
+          <view v-else class="avatar avatar--placeholder">头像</view>
+          <nut-button plain :loading="saving" @click="chooseAvatar">上传头像</nut-button>
+        </view>
 
-      <view class="avatar-row">
-        <image v-if="avatarPreview" class="avatar" :src="avatarPreview" mode="aspectFill" />
-        <view v-else class="avatar avatar--placeholder">头像</view>
-        <button class="btn" :loading="saving" @tap="chooseAvatar">上传头像</button>
-      </view>
+        <view class="field">
+          <text class="label">实名（只读）</text>
+          <nut-input v-model="form.real_name" readonly />
+        </view>
 
-      <view class="field">
-        <text class="label">实名（只读）</text>
-        <input v-model="form.real_name" class="input input--readonly" disabled />
-      </view>
+        <view class="field">
+          <text class="label">昵称</text>
+          <nut-input v-model="form.nickname" placeholder="请输入昵称" maxlength="20" />
+        </view>
 
-      <view class="field">
-        <text class="label">昵称</text>
-        <input v-model="form.nickname" class="input" placeholder="请输入昵称" maxlength="20" />
-      </view>
+        <view class="field">
+          <text class="label">专业</text>
+          <nut-input v-model="form.major" placeholder="请输入专业" maxlength="50" />
+        </view>
 
-      <view class="field">
-        <text class="label">专业</text>
-        <input v-model="form.major" class="input" placeholder="请输入专业" maxlength="50" />
-      </view>
+        <view class="field">
+          <text class="label">学院</text>
+          <nut-input v-model="form.college" placeholder="请输入学院" maxlength="50" />
+        </view>
 
-      <view class="field">
-        <text class="label">学院</text>
-        <input v-model="form.college" class="input" placeholder="请输入学院" maxlength="50" />
-      </view>
+        <view class="field">
+          <text class="label">入学学年</text>
+          <nut-input v-model="form.enrollment_year" type="number" placeholder="例如 2023" maxlength="4" />
+        </view>
 
-      <view class="field">
-        <text class="label">入学学年</text>
-        <input v-model="form.enrollment_year" class="input" type="number" placeholder="例如 2023" maxlength="4" />
-      </view>
+        <view class="field">
+          <text class="label">个性签名</text>
+          <nut-textarea v-model="form.bio" maxlength="100" placeholder="写点什么介绍自己" />
+          <text class="hint">{{ form.bio.length }}/100</text>
+        </view>
 
-      <view class="field">
-        <text class="label">个性签名</text>
-        <textarea v-model="form.bio" class="textarea" maxlength="100" placeholder="写点什么介绍自己" />
-        <text class="hint">{{ form.bio.length }}/100</text>
-      </view>
-
-      <button class="btn primary" :loading="saving" @tap="saveProfile">保存</button>
-    </view>
+        <nut-button type="primary" block :loading="saving" @click="saveProfile">保存</nut-button>
+      </template>
+    </content-panel>
   </view>
 </template>
 
 <style scoped lang="scss">
 .edit-page {
-  padding: var(--space-3);
-}
-
-.state-card,
-.edit-card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
-}
-
-.state-card--error {
-  border-color: #f0c5c5;
-}
-
-.state-title,
-.title {
-  display: block;
-  margin-bottom: var(--space-2);
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-semibold);
-}
-
-.state-desc {
-  display: block;
-  margin-bottom: var(--space-3);
-  color: var(--color-text-secondary);
+  min-height: 100vh;
 }
 
 .avatar-row {
@@ -382,30 +358,6 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.input,
-.textarea {
-  width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: #fff;
-  box-sizing: border-box;
-}
-
-.input {
-  height: 44px;
-  padding: 0 var(--space-2);
-}
-
-.input--readonly {
-  color: var(--color-text-secondary);
-  background: #f6f6f6;
-}
-
-.textarea {
-  min-height: 120px;
-  padding: var(--space-2);
-}
-
 .hint {
   display: block;
   margin-top: var(--space-1);
@@ -413,16 +365,7 @@ onMounted(() => {
   color: var(--color-text-secondary);
 }
 
-.btn {
-  margin-top: var(--space-3);
-  background: #fff;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
-}
-
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
+:deep(.nut-button) {
+  margin-top: 12px;
 }
 </style>

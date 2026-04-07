@@ -118,52 +118,54 @@ loadList()
 
 <template>
   <layout-shell current="knowledge">
-    <view class="admin-page">
-      <view v-if="!hasPermission" class="card state-card state-card--error">
-        <text class="title">无权限访问</text>
-        <text class="desc">仅团学干部及以上角色可管理知识库</text>
-      </view>
+    <view class="admin-page page-container">
+      <content-panel v-if="!hasPermission" title="无权限访问">
+        <template #default>
+          <nut-noticebar text="仅团学干部及以上角色可管理知识库" color="danger" />
+        </template>
+      </content-panel>
 
       <template v-else>
-        <view class="card toolbar">
-          <input v-model="keyword" class="input" placeholder="输入关键词筛选" @confirm="onSearch" />
+        <content-panel class="toolbar" title="知识库管理">
+          <template #default>
+          <nut-input v-model="keyword" placeholder="输入关键词筛选" @confirm="onSearch" />
           <view class="button-row">
-            <button class="btn primary" @tap="onSearch">搜索</button>
-            <button class="btn" @tap="onReset">重置</button>
-            <button class="btn" @tap="goCreate">新增</button>
-            <button class="btn" @tap="goFileUpload">文档上传</button>
-            <button v-if="canUseAIGenerate" class="btn" @tap="goAIGenerate">AI 生成问答</button>
+            <nut-button type="primary" @click="onSearch">搜索</nut-button>
+            <nut-button plain @click="onReset">重置</nut-button>
+            <nut-button plain @click="goCreate">新增</nut-button>
+            <nut-button plain @click="goFileUpload">文档上传</nut-button>
+            <nut-button v-if="canUseAIGenerate" plain @click="goAIGenerate">AI 生成问答</nut-button>
           </view>
-        </view>
+          </template>
+        </content-panel>
 
-        <view v-if="error" class="card state-card state-card--error">
-          <text class="title">加载失败</text>
-          <text class="desc">{{ error }}</text>
-        </view>
+        <nut-noticebar v-if="error" wrapable color="danger" :text="`加载失败：${error}`" />
 
-        <view v-else-if="isEmpty" class="card state-card">
-          <text class="title">暂无数据</text>
-        </view>
+        <nut-empty v-else-if="isEmpty" image="empty" description="暂无数据" />
 
         <view v-else class="list-wrap">
-          <view v-for="item in items" :key="item.id" class="card item-card">
+          <content-panel v-for="item in items" :key="item.id" class="item-card">
+            <template #default>
             <text class="item-title">{{ item.question }}</text>
             <text class="item-meta">关键词：{{ (item.keywords || []).join(' / ') || '无' }}</text>
             <view class="button-row">
-              <button class="btn" @tap="goDetail(item.id)">详情</button>
-              <button class="btn" @tap="goEdit(item.id)">编辑</button>
-              <button class="btn" @tap="goAttachment(item.id)">附件</button>
-              <button v-if="canDeleteKnowledge" class="btn danger" @tap="removeItem(item.id)">删除</button>
+              <nut-button plain @click="goDetail(item.id)">详情</nut-button>
+              <nut-button plain @click="goEdit(item.id)">编辑</nut-button>
+              <nut-button plain @click="goAttachment(item.id)">附件</nut-button>
+              <nut-button v-if="canDeleteKnowledge" type="danger" @click="removeItem(item.id)">删除</nut-button>
             </view>
-          </view>
+            </template>
+          </content-panel>
 
-          <view class="card pager">
+          <content-panel class="pager">
+            <template #default>
             <text>共 {{ total }} 条，当前偏移 {{ offset }}</text>
             <view class="button-row">
-              <button class="btn" :disabled="!canPrev || loading" @tap="prevPage">上一页</button>
-              <button class="btn" :disabled="!canNext || loading" @tap="nextPage">下一页</button>
+              <nut-button plain :disabled="!canPrev || loading" @click="prevPage">上一页</nut-button>
+              <nut-button plain :disabled="!canNext || loading" @click="nextPage">下一页</nut-button>
             </view>
-          </view>
+            </template>
+          </content-panel>
         </view>
       </template>
     </view>
@@ -172,31 +174,13 @@ loadList()
 
 <style scoped lang="scss">
 .admin-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .toolbar {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.input {
-  height: 40px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0 var(--space-2);
-  background: #fff;
 }
 
 .list-wrap {
@@ -226,25 +210,7 @@ loadList()
   color: var(--color-text-secondary);
 }
 
-.btn {
-  margin: 0;
-  background: #fff;
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  border-radius: var(--radius-md);
-}
-
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.btn.danger {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-}
-
-.state-card--error {
-  border-color: #f3c2c2;
+:deep(.nut-input) {
+  margin-bottom: 10px;
 }
 </style>

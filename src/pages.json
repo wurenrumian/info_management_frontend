@@ -97,5 +97,12 @@
     "navigationBarTitleText": "学院事务",
     "navigationBarBackgroundColor": "#F8F8F8",
     "backgroundColor": "#F8F8F8"
+  },
+  "easycom": {
+    "autoscan": true,
+    "custom": {
+      "^nut-(.*)?-(.*)": "nutui-uniapp/components/$1$2/$1$2.vue",
+      "^nut-(.*)": "nutui-uniapp/components/$1/$1.vue"
+    }
   }
 }

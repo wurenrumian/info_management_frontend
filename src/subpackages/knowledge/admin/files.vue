@@ -152,24 +152,23 @@ loadFiles()
 
 <template>
   <layout-shell current="knowledge">
-    <view class="files-page">
-      <view v-if="!hasPermission" class="card state-card state-card--error">
-        <text class="title">无权限访问</text>
-      </view>
+    <view class="files-page page-container">
+      <content-panel v-if="!hasPermission" title="无权限访问" />
 
       <template v-else>
-        <view class="card">
-          <text class="title">知识库文档上传</text>
+        <content-panel title="知识库文档上传">
+          <template #default>
           <text class="desc">支持 Word / Excel / PDF，上传后可在条目“附件管理”中绑定</text>
-          <button class="btn primary" :loading="uploading" @tap="uploadDocs">上传文档</button>
-        </view>
+          <nut-button type="primary" :loading="uploading" @click="uploadDocs">上传文档</nut-button>
+          </template>
+        </content-panel>
 
-        <view class="card">
-          <text class="title">文件检索</text>
+        <content-panel title="文件检索">
+          <template #default>
           <text class="desc">按标题和文档正文检索，快速定位历史上传文件</text>
           <view class="search-row">
-            <input v-model="searchKeyword" class="input" placeholder="例如：奖学金、请假、入党流程" @confirm="runSearch" />
-            <button class="btn" :loading="searching" @tap="runSearch">检索</button>
+            <nut-input v-model="searchKeyword" placeholder="例如：奖学金、请假、入党流程" @confirm="runSearch" />
+            <nut-button plain :loading="searching" @click="runSearch">检索</nut-button>
           </view>
 
           <view v-if="searched" class="search-result">
@@ -179,33 +178,34 @@ loadFiles()
                 <text class="name">{{ file.title }}</text>
                 <text class="meta">ID {{ file.id }} · {{ file.content_type || '-' }}</text>
                 <text v-if="file.snippet" class="snippet">{{ file.snippet }}</text>
-                <button v-if="isSuperAdmin" class="btn danger" @tap="removeFileItem(file)">删除文档</button>
+                <nut-button v-if="isSuperAdmin" type="danger" size="small" @click="removeFileItem(file)">删除文档</nut-button>
               </view>
             </view>
             <text v-else class="desc">没有检索到结果</text>
           </view>
-        </view>
+          </template>
+        </content-panel>
 
-        <view v-if="loading" class="card state-card">
-          <text>加载中...</text>
-        </view>
+        <content-panel v-if="loading" title="最近文档">
+          <template #default>
+            <nut-empty image="empty" description="加载中..." />
+          </template>
+        </content-panel>
 
-        <view v-else-if="error" class="card state-card state-card--error">
-          <text class="title">加载失败</text>
-          <text class="desc">{{ error }}</text>
-        </view>
+        <nut-noticebar v-else-if="error" color="danger" wrapable :text="error" />
 
-        <view v-else class="card">
-          <text class="title">最近文档</text>
+        <content-panel v-else title="最近文档">
+          <template #default>
           <view v-if="files.length > 0" class="list">
             <view v-for="file in files" :key="file.id" class="row">
               <text class="name">{{ file.title }}</text>
               <text class="meta">ID {{ file.id }} · {{ file.content_type || '-' }}</text>
-              <button v-if="isSuperAdmin" class="btn danger" @tap="removeFileItem(file)">删除文档</button>
+              <nut-button v-if="isSuperAdmin" type="danger" size="small" @click="removeFileItem(file)">删除文档</nut-button>
             </view>
           </view>
           <text v-else class="desc">暂无文档</text>
-        </view>
+          </template>
+        </content-panel>
       </template>
     </view>
   </layout-shell>
@@ -213,17 +213,7 @@ loadFiles()
 
 <style scoped lang="scss">
 .files-page {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .title {
@@ -243,15 +233,7 @@ loadFiles()
   margin-top: var(--space-2);
   display: flex;
   gap: var(--space-2);
-}
-
-.input {
-  flex: 1;
-  height: 40px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: 0 var(--space-2);
-  background: #fff;
+  align-items: center;
 }
 
 .search-result {
@@ -282,20 +264,7 @@ loadFiles()
   font-size: var(--font-size-sm);
 }
 
-.btn {
-  margin-top: var(--space-3);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background: #fff;
-}
-
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.state-card--error {
-  border-color: #f3c2c2;
+:deep(.nut-input) {
+  flex: 1;
 }
 </style>
