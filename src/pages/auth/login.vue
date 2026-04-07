@@ -161,106 +161,83 @@ async function handleDevLogin() {
 </script>
 
 <template>
-  <view class="login-page">
-    <view class="login-card">
-      <text class="title">登录</text>
-      <text class="subtitle">集中处理微信登录、公开注册/激活与开发快捷登录</text>
-
-      <view class="tab-row">
-        <view
-          v-for="tab in modeTabs"
-          :key="tab.key"
-          class="tab-item"
-          :class="{ 'tab-item--active': mode === tab.key }"
-          @tap="selectMode(tab.key)"
-        >
-          {{ tab.label }}
+  <view class="login-page page-container">
+    <content-panel class="login-card" title="登录" sub-title="微信登录、公开注册/激活与开发快捷登录">
+      <template #default>
+        <view class="tab-row">
+          <nut-button
+            v-for="tab in modeTabs"
+            :key="tab.key"
+            :type="mode === tab.key ? 'primary' : 'default'"
+            size="small"
+            @click="selectMode(tab.key)"
+          >
+            {{ tab.label }}
+          </nut-button>
         </view>
-      </view>
 
-      <view v-if="mode === 'wechat'" class="panel">
-        <text class="panel-title">微信登录</text>
-        <text class="panel-hint">适用于已绑定微信账号的用户</text>
-        <button class="btn primary" :loading="loading" @tap="handleWechatLogin">微信登录并进入个人主页</button>
-        <button class="btn link" @tap="selectMode('public')">未绑定？改用公开注册/激活</button>
-      </view>
+        <view v-if="mode === 'wechat'" class="panel">
+          <view class="panel-title-row">
+            <nut-icon name="my" />
+            <text class="panel-title">微信登录</text>
+          </view>
+          <text class="panel-hint">适用于已绑定微信账号的用户</text>
+          <nut-button type="primary" block :loading="loading" @click="handleWechatLogin">微信登录并进入个人主页</nut-button>
+          <nut-button plain block @click="selectMode('public')">未绑定？改用公开注册/激活</nut-button>
+        </view>
 
-      <view v-else-if="mode === 'public'" class="panel">
-        <text class="panel-title">公开注册/激活</text>
-        <text class="panel-hint">输入学号和姓名即可激活账号；小程序可选择同时绑定当前微信</text>
-        <input v-model="publicStudentId" class="input" placeholder="请输入学号" />
-        <input v-model="publicName" class="input" placeholder="请输入姓名" />
+        <view v-else-if="mode === 'public'" class="panel">
+          <view class="panel-title-row">
+            <nut-icon name="people" />
+            <text class="panel-title">公开注册/激活</text>
+          </view>
+          <text class="panel-hint">输入学号和姓名即可激活账号；小程序可选择同时绑定当前微信</text>
+          <nut-input v-model="publicStudentId" placeholder="请输入学号" />
+          <nut-input v-model="publicName" placeholder="请输入姓名" />
 
-        <label v-if="isMpWeixin" class="switch-row">
-          <text>注册时同时绑定当前微信</text>
-          <switch :checked="bindWechatOnPublicRegister" @change="handleBindWechatChange" />
-        </label>
+          <label v-if="isMpWeixin" class="switch-row">
+            <text>注册时同时绑定当前微信</text>
+            <switch :checked="bindWechatOnPublicRegister" @change="handleBindWechatChange" />
+          </label>
 
-        <button class="btn primary" :loading="loading" @tap="handlePublicRegister">提交公开注册/激活</button>
-      </view>
+          <nut-button type="primary" block :loading="loading" @click="handlePublicRegister">提交公开注册/激活</nut-button>
+        </view>
 
-      <view v-else class="panel">
-        <text class="panel-title">开发快捷登录</text>
-        <text class="panel-hint">仅开发环境可见，调用 dev/register-or-login</text>
-        <input v-model="devStudentId" class="input" placeholder="测试学号" />
-        <picker class="picker" :range="[1, 2, 3, 4]" :value="devRole - 1" @change="handleDevRoleChange">
-          <view class="picker-text">角色：{{ devRole }}（1学生 2干部 3教师 4管理员）</view>
-        </picker>
-        <button class="btn" :loading="loading" @tap="handleDevLogin">开发快捷登录</button>
-      </view>
-    </view>
+        <view v-else class="panel">
+          <view class="panel-title-row">
+            <nut-icon name="setting" />
+            <text class="panel-title">开发快捷登录</text>
+          </view>
+          <text class="panel-hint">仅开发环境可见，调用 dev/register-or-login</text>
+          <nut-input v-model="devStudentId" placeholder="测试学号" />
+          <picker class="picker" :range="[1, 2, 3, 4]" :value="devRole - 1" @change="handleDevRoleChange">
+            <view class="picker-text">角色：{{ devRole }}（1学生 2干部 3教师 4管理员）</view>
+          </picker>
+          <nut-button block :loading="loading" @click="handleDevLogin">开发快捷登录</nut-button>
+        </view>
+      </template>
+    </content-panel>
   </view>
 </template>
 
 <style scoped lang="scss">
 .login-page {
   min-height: 100vh;
-  padding: var(--space-4);
-  background: var(--color-bg);
+  padding-top: var(--space-4);
+  padding-bottom: var(--space-4);
 }
 
 .login-card {
-  max-width: 520px;
+  width: 100%;
+  max-width: 560px;
   margin: 0 auto;
-  padding: var(--space-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-card);
-}
-
-.title {
-  display: block;
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-semibold);
-}
-
-.subtitle {
-  display: block;
-  margin-top: var(--space-1);
-  margin-bottom: var(--space-3);
-  color: var(--color-text-secondary);
 }
 
 .tab-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   margin-bottom: var(--space-3);
-}
-
-.tab-item {
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  color: var(--color-text-secondary);
-  background: #fff;
-}
-
-.tab-item--active {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
 }
 
 .panel {
@@ -268,28 +245,26 @@ async function handleDevLogin() {
   border-top: 1px dashed var(--color-border);
 }
 
+.panel-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .panel-title {
-  display: block;
-  margin-bottom: var(--space-2);
   font-weight: var(--font-weight-medium);
 }
 
 .panel-hint {
   display: block;
-  margin-bottom: var(--space-2);
+  margin: var(--space-2) 0;
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
+  line-height: 1.6;
 }
 
-.input {
-  width: 100%;
-  height: 44px;
-  margin-top: var(--space-2);
-  padding: 0 var(--space-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: #fff;
-  box-sizing: border-box;
+:deep(.nut-input) {
+  margin-top: 8px;
 }
 
 .switch-row {
@@ -298,10 +273,11 @@ async function handleDevLogin() {
   justify-content: space-between;
   margin-top: var(--space-3);
   color: var(--color-text-secondary);
+  gap: var(--space-2);
 }
 
 .picker {
-  margin-top: var(--space-2);
+  margin: var(--space-2) 0;
 }
 
 .picker-text {
@@ -313,21 +289,68 @@ async function handleDevLogin() {
   background: #fff;
 }
 
-.btn {
-  margin-top: var(--space-3);
-  background: #fff;
-  color: var(--color-primary);
-  border: 1px solid var(--color-primary);
-  border-radius: var(--radius-md);
+:deep(.nut-button) {
+  margin-top: 10px;
 }
 
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
+@media (max-width: 767px) {
+  .login-page {
+    padding-top: var(--space-3);
+  }
+
+  .login-card {
+    max-width: none;
+  }
+
+  .panel-title-row {
+    gap: 8px;
+  }
+
+  .panel-title {
+    font-size: var(--font-size-md);
+  }
+
+  .panel-hint,
+  .switch-row,
+  .picker-text {
+    font-size: 14px;
+  }
 }
 
-.btn.link {
-  border: none;
-  color: var(--color-text-secondary);
+@media (min-width: 1024px) {
+  .login-page {
+    justify-content: center;
+    padding-top: 4vh;
+    padding-bottom: 4vh;
+  }
+
+  .login-card {
+    max-width: var(--content-narrow-width);
+  }
+
+  .tab-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: var(--space-4);
+  }
+
+  .panel {
+    padding-top: var(--space-4);
+  }
+
+  .panel-title {
+    font-size: 18px;
+  }
+
+  .panel-hint,
+  .switch-row,
+  .picker-text {
+    font-size: 15px;
+  }
+
+  :deep(.nut-input) {
+    margin-top: 12px;
+  }
 }
 </style>

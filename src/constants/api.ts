@@ -19,6 +19,7 @@ export const API_KNOWLEDGE_LIST = '/api/v1/knowledge'
 export const API_ADMIN_KNOWLEDGE_LIST = '/api/v1/admin/knowledge'
 export const API_ADMIN_KNOWLEDGE_DETAIL = '/api/v1/admin/knowledge'
 export const API_ADMIN_KNOWLEDGE_QA_GENERATE_PREVIEW = '/api/v1/admin/knowledge/qa-generate-preview'
+export const API_ADMIN_KNOWLEDGE_QA_GENERATE_PREVIEW_STREAM = '/api/v1/admin/knowledge/qa-generate-preview/stream'
 export const API_ADMIN_KNOWLEDGE_BATCH = '/api/v1/admin/knowledge/batch'
 
 export const API_ANNOUNCEMENT_LIST = '/api/v1/announcements'

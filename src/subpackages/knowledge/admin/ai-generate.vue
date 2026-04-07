@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import LayoutShell from '@/components/layout-shell.vue'
 import { searchFiles, getFileList, type UploadedFile, type SearchFileItem } from '@/services/file'
-import { batchCreateKnowledge, generateKnowledgeQaPreview } from '@/services/knowledge'
+import { batchCreateKnowledge, generateKnowledgeQaPreview, generateKnowledgeQaPreviewStream } from '@/services/knowledge'
 import { useUserStore } from '@/stores/user'
 import { UserRole } from '@/constants/enums'
 import type { KnowledgeAIDraftItem } from '@/types/knowledge'
@@ -14,6 +14,7 @@ const COUNT_OPTIONS = Array.from({ length: 30 }, (_, index) => index + 1)
 interface EditableDraft extends KnowledgeAIDraftItem {
   local_id: string
   selected: boolean
+  keywords: string[]
   keyword_input: string
   attachment_input: string
 }
@@ -24,6 +25,7 @@ const canUseAIGenerate = computed(() => Number(userStore.userInfo?.role || 0) >=
 const loadingFiles = ref(false)
 const generating = ref(false)
 const submitting = ref(false)
+const streamStatus = ref('')
 
 const fileSearchKeyword = ref('')
 const fileSearching = ref(false)
@@ -210,19 +212,35 @@ async function generateDrafts() {
   }
 
   generating.value = true
+  streamStatus.value = ''
   try {
-    const res = await generateKnowledgeQaPreview({
+    const payload = {
       file_ids: selectedFileIds.value,
       qa_count_range: {
         min: Number(minCount.value),
         max: Number(maxCount.value),
       },
-    })
+    }
+
+    const uniPlatform = String(uni.getSystemInfoSync().uniPlatform || '').toLowerCase()
+    const isH5 = uniPlatform === 'web' || uniPlatform === 'h5'
+    const res = isH5
+      ? await generateKnowledgeQaPreviewStream(payload, {
+          onStatus: (status) => {
+            if (status === 'connecting') streamStatus.value = '正在连接流式生成通道...'
+            else if (status === 'receiving') streamStatus.value = 'AI 正在流式生成草稿...'
+            else if (status.startsWith('parsed-')) streamStatus.value = `已接收草稿 ${status.slice(7)} 条`
+            else if (status === 'done') streamStatus.value = '流式生成完成'
+          },
+        })
+      : await generateKnowledgeQaPreview(payload)
+
     drafts.value = res.data.map((item, index) => buildDraft(item, index))
     uni.showToast({ title: `已生成 ${res.total} 条草稿`, icon: 'success' })
   } catch (e) {
     uni.showToast({ title: e instanceof Error ? e.message : '生成失败', icon: 'none' })
   } finally {
+    streamStatus.value = ''
     generating.value = false
   }
 }
@@ -356,20 +374,15 @@ loadRecentFiles()
             </view>
           </view>
 
-          <input
-            v-model="fileSearchKeyword"
-            class="input"
-            placeholder="输入关键词筛选文档"
-            @confirm="runFileSearch"
-          />
+          <nut-input v-model="fileSearchKeyword" class="input" placeholder="输入关键词筛选文档" @confirm="runFileSearch" />
           <view class="button-row">
-            <button class="btn" :loading="fileSearching" @tap="runFileSearch">检索</button>
-            <button class="btn" @tap="resetFileSearch">重置</button>
+            <nut-button plain :loading="fileSearching" @click="runFileSearch">检索</nut-button>
+            <nut-button plain @click="resetFileSearch">重置</nut-button>
           </view>
 
           <view class="selected-bar">
             <text class="meta">已选文档 ID：{{ selectedFileIds.join(', ') || '无' }}</text>
-            <button class="btn mini" @tap="clearSelectedFiles">清空</button>
+            <nut-button class="btn mini" plain @click="clearSelectedFiles">清空</nut-button>
           </view>
 
           <view class="list-wrap">
@@ -408,7 +421,8 @@ loadRecentFiles()
             <text v-else-if="!fileSearching" class="meta">暂无匹配文档</text>
           </view>
 
-          <button class="btn primary" :loading="generating" :disabled="generating" @tap="generateDrafts">生成草稿</button>
+          <nut-button type="primary" :loading="generating" :disabled="generating" @click="generateDrafts">生成草稿</nut-button>
+          <text v-if="streamStatus" class="meta">{{ streamStatus }}</text>
         </view>
 
         <view class="card section">
@@ -423,8 +437,8 @@ loadRecentFiles()
 
           <template v-else>
             <view class="button-row">
-              <button class="btn" :disabled="allDraftSelected" @tap="selectAllDrafts">全选</button>
-              <button class="btn" @tap="invertDraftSelection">反选</button>
+              <nut-button plain :disabled="allDraftSelected" @click="selectAllDrafts">全选</nut-button>
+              <nut-button plain @click="invertDraftSelection">反选</nut-button>
             </view>
 
             <view class="draft-list">
@@ -434,29 +448,24 @@ loadRecentFiles()
                     <switch :checked="draft.selected" @change="onDraftSelectChange(draft, $event)" />
                     <text>提交此条</text>
                   </label>
-                  <button class="btn mini danger" @tap="deleteDraft(draft.local_id)">删除</button>
+                  <nut-button class="btn mini danger" type="danger" @click="deleteDraft(draft.local_id)">删除</nut-button>
                 </view>
 
                 <view class="field">
                   <text class="label">问题</text>
-                  <textarea v-model="draft.question" class="textarea" maxlength="200" placeholder="请输入问题" />
+                  <nut-textarea v-model="draft.question" class="textarea" maxlength="200" placeholder="请输入问题" />
                 </view>
 
                 <view class="field">
                   <text class="label">答案</text>
-                  <textarea v-model="draft.answer" class="textarea textarea--large" maxlength="5000" placeholder="请输入答案" />
+                  <nut-textarea v-model="draft.answer" class="textarea textarea--large" maxlength="5000" placeholder="请输入答案" />
                 </view>
 
                 <view class="field">
                   <text class="label">关键词（回车添加）</text>
                   <view class="keyword-input-row">
-                    <input
-                      v-model="draft.keyword_input"
-                      class="input"
-                      placeholder="输入关键词后回车"
-                      @confirm="addKeywords(draft)"
-                    />
-                    <button class="btn mini" @tap="addKeywords(draft)">添加</button>
+                    <nut-input v-model="draft.keyword_input" class="input" placeholder="输入关键词后回车" @confirm="addKeywords(draft)" />
+                    <nut-button class="btn mini" plain @click="addKeywords(draft)">添加</nut-button>
                   </view>
                   <view class="tag-wrap">
                     <view v-for="keyword in draft.keywords" :key="`${draft.local_id}-${keyword}`" class="tag">
@@ -469,14 +478,14 @@ loadRecentFiles()
                 <view class="field">
                   <text class="label">附件文件 ID（逗号分隔）</text>
                   <view class="attachment-row">
-                    <input
+                    <nut-input
                       v-model="draft.attachment_input"
                       class="input"
                       placeholder="例如：12, 18"
                       @confirm="applyAttachmentInput(draft)"
                       @blur="applyAttachmentInput(draft)"
                     />
-                    <button class="btn mini" @tap="useSelectedFilesForDraft(draft)">使用已选文档</button>
+                    <nut-button class="btn mini" plain @click="useSelectedFilesForDraft(draft)">使用已选文档</nut-button>
                   </view>
                   <view class="tag-wrap">
                     <view v-for="fileId in draft.attachment_file_ids" :key="`${draft.local_id}-${fileId}`" class="tag">
@@ -491,7 +500,7 @@ loadRecentFiles()
         </view>
 
         <view class="card section submit-card">
-          <button class="btn primary" :loading="submitting" :disabled="submitting" @tap="submitBatch">批量提交</button>
+          <nut-button type="primary" :loading="submitting" :disabled="submitting" @click="submitBatch">批量提交</nut-button>
           <text class="desc">批量提交使用事务语义，任一条失败将整体回滚</text>
         </view>
       </template>

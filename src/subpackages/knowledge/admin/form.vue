@@ -126,67 +126,49 @@ onLoad((query) => {
 
 <template>
   <layout-shell current="knowledge">
-    <view class="form-page">
-      <view v-if="!hasPermission" class="card state-card state-card--error">
-        <text class="title">无权限访问</text>
-      </view>
+    <view class="form-page page-container">
+      <content-panel v-if="!hasPermission" title="无权限访问" />
 
-      <view v-else class="card form-card">
-        <text class="title">{{ pageTitle }}</text>
-
+      <content-panel v-else :title="pageTitle">
+        <template #default>
         <view v-if="loading" class="state-block">
-          <text>加载中...</text>
+          <nut-empty image="empty" description="加载中..." />
         </view>
 
-        <view v-else-if="error" class="state-block state-block--error">
-          <text>{{ error }}</text>
-        </view>
+        <nut-noticebar v-else-if="error" color="danger" :text="error" />
 
         <template v-else>
           <view class="field">
             <text class="label">问题</text>
-            <textarea v-model="question" class="textarea" maxlength="200" placeholder="请输入问题" />
+            <nut-textarea v-model="question" maxlength="200" placeholder="请输入问题" />
           </view>
 
           <view class="field">
             <text class="label">答案</text>
-            <textarea v-model="answer" class="textarea textarea--large" maxlength="5000" placeholder="请输入标准答案" />
+            <nut-textarea v-model="answer" class="textarea--large" maxlength="5000" placeholder="请输入标准答案" />
           </view>
 
           <view class="field">
             <text class="label">关键词（空格分隔）</text>
-            <textarea
-              v-model="keywordsInput"
-              class="textarea textarea--keywords"
-              placeholder="例如：休学 申请 流程"
-              maxlength="200"
-            />
+            <nut-textarea v-model="keywordsInput" class="textarea--keywords" placeholder="例如：休学 申请 流程" maxlength="200" />
           </view>
 
           <text class="tip">附件请在保存后前往“附件管理”页面绑定</text>
 
           <view class="action-row">
-            <button class="btn" :loading="saving" @tap="submit(false)">仅保存</button>
-            <button class="btn primary" :loading="saving" @tap="submit(true)">保存并管理附件</button>
+            <nut-button plain :loading="saving" @click="submit(false)">仅保存</nut-button>
+            <nut-button type="primary" :loading="saving" @click="submit(true)">保存并管理附件</nut-button>
           </view>
         </template>
-      </view>
+        </template>
+      </content-panel>
     </view>
   </layout-shell>
 </template>
 
 <style scoped lang="scss">
 .form-page {
-  display: flex;
-  flex-direction: column;
-}
-
-.card {
-  padding: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  min-height: 100vh;
 }
 
 .title {
@@ -205,18 +187,8 @@ onLoad((query) => {
   color: var(--color-text-secondary);
 }
 
-.input,
-.textarea {
-  width: 100%;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  background: #fff;
-  padding: var(--space-2);
-  box-sizing: border-box;
-}
-
-.textarea {
-  min-height: 96px;
+:deep(.nut-textarea) {
+  margin-top: 4px;
 }
 
 .textarea--keywords {
@@ -229,26 +201,9 @@ onLoad((query) => {
 
 .action-row {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--space-2);
   margin-top: var(--space-4);
-}
-
-.btn {
-  margin-top: var(--space-2);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-primary);
-  color: var(--color-primary);
-  background: #fff;
-}
-
-.btn.primary {
-  background: var(--color-primary);
-  color: #fff;
-}
-
-.btn.danger {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
 }
 
 .tip {
@@ -257,9 +212,4 @@ onLoad((query) => {
   color: var(--color-text-secondary);
 }
 
-.state-card--error,
-.state-block--error {
-  border-color: #f3c2c2;
-  color: var(--color-danger);
-}
 </style>

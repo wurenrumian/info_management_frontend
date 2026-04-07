@@ -1,0 +1,68 @@
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
+}
+
+.section-card {
+  border-radius: 14px;
+}
+
+.section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+@media (min-width: 1024px) {
+  .layout-shell--h5 {
+    --nut-button-border-radius: 12px;
+    --nut-button-default-height: 42px;
+    --nut-button-block-height: 46px;
+    --nut-button-small-height: 32px;
+    --nut-button-default-font-size: 15px;
+  }
+
+  .layout-shell--h5 .page-container {
+    max-width: var(--content-max-width);
+    gap: var(--space-4);
+    margin: 0 auto;
+  }
+
+  .layout-shell--h5 .section-card {
+    border-radius: 18px;
+  }
+
+  .layout-shell--h5 .nut-noticebar {
+    border-radius: 14px;
+  }
+
+  .layout-shell--h5 .nut-cell {
+    min-height: 56px;
+  }
+
+  .layout-shell--h5 .nut-cell,
+  .layout-shell--h5 .nut-cell__title,
+  .layout-shell--h5 .nut-cell__value,
+  .layout-shell--h5 .nut-input,
+  .layout-shell--h5 .nut-textarea,
+  .layout-shell--h5 input,
+  .layout-shell--h5 textarea {
+    font-size: 15px;
+  }
+}
