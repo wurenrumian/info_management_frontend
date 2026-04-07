@@ -7,6 +7,7 @@
 - 技术栈：uni-app + Vue3 + TypeScript
 - 目标平台：微信小程序（优先）+ H5
 - 状态管理：Pinia
+- UI 组件库：`nutui-uniapp`
 - Node.js 要求：`>=18.0.0`
 - 开发规范入口：`docs/development-standard.md`
 
@@ -106,11 +107,12 @@ VITE_ENABLE_DEV_WECHAT_TOOLS=true
 
 ## 5. 开发时必须遵守的约束（摘录）
 
-1. 页面/组件中禁止直接写 `uni.request`，必须走 `src/services/`
+1. 页面/组件中禁止直接写 `uni.request` / `fetch`，必须走 `src/services/`（常规接口走 `request.ts`，流式场景由 service 层统一封装）
 2. 禁止硬编码接口地址，统一使用环境变量 + 常量
 3. 接口路径统一维护在 `src/constants/api.ts`
 4. 跨模块开发遵循目录归属，避免互相引用内部实现
 5. 提交前至少通过：`lint`、`type-check`、`build:mp-weixin`、`build:h5`
+6. 页面 UI 优先使用 `nutui-uniapp` 组件，确需自定义时再做薄封装
 
 ## 6. 常用命令速查
 

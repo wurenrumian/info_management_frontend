@@ -17,10 +17,11 @@
 - 包管理器：pnpm（推荐）或 npm，团队统一
 - 构建工具：HBuilderX 或 uni-app CLI（vite）
 - 状态管理：Pinia
-- 请求库：uni.request 封装（统一 service 层）
+- UI 组件库：`nutui-uniapp`
+- 请求库：以 `uni.request` 封装为主（统一 service 层）；流式接口可在 service 层按需使用 `fetch`
 
 约束：
-- 禁止在页面/组件中直接写 `uni.request` 调用，必须经过 service 层
+- 禁止在页面/组件中直接写 `uni.request` / `fetch` 调用，必须经过 service 层
 - 禁止硬编码接口地址，必须通过环境变量注入
 - 禁止在组件中直接操作全局 store 做表单临时状态管理
 
@@ -118,9 +119,10 @@ src/
 ### 共享服务约定
 
 `src/services/request.ts` 为统一请求封装，所有模块需要网络请求能力时：
-- 通过 `request.ts` 导出的方法发起请求
-- 禁止各模块自行封装 `uni.request`
+- 常规接口通过 `request.ts` 导出的方法发起请求
+- 禁止在页面/组件中直接发起网络请求
 - 统一错误处理、token 注入、loading 状态由 `request.ts` 管理
+- 仅流式响应（如 SSE/ReadableStream）可在 service 层使用 `fetch`，并复用统一 URL、鉴权和状态码处理策略
 
 ---
 
@@ -154,6 +156,12 @@ src/
 - 统一错误处理（401 跳转登录、403 提示权限、500 提示服务异常）
 - 支持 loading 状态管理
 - 返回统一格式：`{ data: T }` 或抛出错误
+
+流式请求补充约定（仅限 service 层）：
+- 仅在 `uni.request` 无法满足流式读取时使用 `fetch`
+- 必须使用 `resolveApiUrl` 解析地址，禁止硬编码完整域名
+- 必须复用 token 注入与 401/403/5xx 处理逻辑，行为与 `request.ts` 保持一致
+- 页面/组件只调用 service 方法，不直接消费底层请求实现细节
 
 ```typescript
 // Service 层示例
@@ -218,6 +226,8 @@ export function shareToWeixin(title: string, path: string): void {
 
 ## 8. UI 与交互规范
 
+- 优先使用 `nutui-uniapp` 官方组件（如 `Button`、`Form`、`Cell`、`Popup`），避免重复造轮子
+- 业务复用样式优先基于 NutUI 组件二次封装，不直接在页面散落重复样式
 - 组件命名：大驼峰（PascalCase），如 `KnowledgeCard.vue`
 - 页面文件命名：小写 + 短横线，如 `search-result.vue`
 - 样式使用 scoped，避免全局污染
