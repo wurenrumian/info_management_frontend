@@ -90,6 +90,86 @@
           }
         }
       ]
+    },
+    {
+      "root": "subpackages/announcements",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "信息发布"
+          }
+        },
+        {
+          "path": "detail",
+          "style": {
+            "navigationBarTitleText": "通知详情"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/approvals",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "审批流程"
+          }
+        },
+        {
+          "path": "form",
+          "style": {
+            "navigationBarTitleText": "发起申请"
+          }
+        },
+        {
+          "path": "detail",
+          "style": {
+            "navigationBarTitleText": "审批详情"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/partyflow",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "党团流程"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/certificates",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "电子证件"
+          }
+        },
+        {
+          "path": "form",
+          "style": {
+            "navigationBarTitleText": "证件申请"
+          }
+        },
+        {
+          "path": "records",
+          "style": {
+            "navigationBarTitleText": "我的证件"
+          }
+        },
+        {
+          "path": "detail",
+          "style": {
+            "navigationBarTitleText": "证件详情"
+          }
+        }
+      ]
     }
   ],
   "globalStyle": {
