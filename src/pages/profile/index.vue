@@ -80,6 +80,22 @@ function goEditPage() {
   uni.navigateTo({ url: '/pages/profile/edit' })
 }
 
+function goAnnouncements() {
+  uni.navigateTo({ url: '/subpackages/announcements/index' })
+}
+
+function goApprovals() {
+  uni.navigateTo({ url: '/subpackages/approvals/index' })
+}
+
+function goPartyflow() {
+  uni.navigateTo({ url: '/subpackages/partyflow/index' })
+}
+
+function goCertificates() {
+  uni.navigateTo({ url: '/subpackages/certificates/index' })
+}
+
 function goHome() {
   uni.reLaunch({ url: '/pages/home/index' })
 }
@@ -157,6 +173,15 @@ onMounted(() => {
             <nut-cell title="审批" :desc="String(profile.quickEntry.approvalsCount)" icon="checked" />
             <nut-cell title="知识库" :desc="String(profile.quickEntry.knowledgeCount)" icon="category" />
             <nut-cell title="未读通知" :desc="String(profile.quickEntry.unreadNotifications)" icon="notice" />
+          </template>
+        </content-panel>
+
+        <content-panel title="常用入口">
+          <template #default>
+            <nut-cell title="信息发布" desc="查看通知和活动消息" icon="message" is-link @click="goAnnouncements" />
+            <nut-cell title="审批流程" desc="发起申请或处理任务" icon="checked" is-link @click="goApprovals" />
+            <nut-cell title="党团流程" desc="查看阶段与提醒" icon="notice" is-link @click="goPartyflow" />
+            <nut-cell title="电子证件" desc="申请和查看证明记录" icon="tips" is-link @click="goCertificates" />
           </template>
         </content-panel>
 

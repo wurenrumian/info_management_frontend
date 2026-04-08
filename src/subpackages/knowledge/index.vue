@@ -137,13 +137,15 @@ function openFile(url?: string) {
       <nut-empty v-else-if="isEmpty" image="empty" description="暂无匹配结果，可尝试更短关键词" />
 
       <view v-else-if="knowledgeItems.length > 0 && mode === 'knowledge'" class="list-wrap">
-        <content-panel v-for="item in knowledgeItems" :key="item.id" class="item-card" @click="goDetail(item.id)">
-          <template #default>
-            <text class="item-title">{{ item.question }}</text>
-            <text class="item-meta">关键词：{{ (item.keywords || []).join(' / ') || '无' }}</text>
-            <text class="item-meta">更新时间：{{ item.updated_at || '-' }}</text>
-          </template>
-        </content-panel>
+        <view v-for="item in knowledgeItems" :key="item.id" class="item-card" @tap="goDetail(item.id)">
+          <content-panel>
+            <template #default>
+              <text class="item-title">{{ item.question }}</text>
+              <text class="item-meta">关键词：{{ (item.keywords || []).join(' / ') || '无' }}</text>
+              <text class="item-meta">更新时间：{{ item.updated_at || '-' }}</text>
+            </template>
+          </content-panel>
+        </view>
         <nut-button v-if="hasMore" plain :loading="loading" @click="runSearch(true)">加载更多</nut-button>
       </view>
 

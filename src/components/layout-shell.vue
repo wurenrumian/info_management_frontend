@@ -4,7 +4,7 @@ import { isH5, isWeixinMiniProgram } from '@/utils/platform'
 import { useUserStore } from '@/stores/user'
 import { getUserInfo } from '@/services/auth'
 
-type NavKey = 'home' | 'knowledge' | 'profile'
+type NavKey = 'home' | 'knowledge' | 'announcements' | 'approvals' | 'partyflow' | 'certificates' | 'profile'
 
 const props = defineProps<{
   current: NavKey
@@ -15,6 +15,8 @@ const userStore = useUserStore()
 const navItems: Array<{ key: NavKey; label: string; path: string; icon: string }> = [
   { key: 'home', label: '首页', path: '/pages/home/index', icon: 'home' },
   { key: 'knowledge', label: '知识库', path: '/subpackages/knowledge/index', icon: 'category' },
+  { key: 'announcements', label: '通知', path: '/subpackages/announcements/index', icon: 'message' },
+  { key: 'partyflow', label: '党团', path: '/subpackages/partyflow/index', icon: 'notice' },
   { key: 'profile', label: '个人', path: '/pages/profile/index', icon: 'my' },
 ]
 
@@ -25,7 +27,19 @@ function goTo(path: string) {
   if (path === `/${getCurrentPages().slice(-1)[0]?.route}`) {
     return
   }
-  uni.reLaunch({ url: path })
+
+  if (path === '/pages/home/index') {
+    uni.reLaunch({ url: path })
+    return
+  }
+
+  uni.redirectTo({
+    url: path,
+    fail: () => {
+      // Some environments may reject redirect between package boundaries.
+      uni.reLaunch({ url: path })
+    },
+  })
 }
 
 async function ensureUserInfoLoaded() {
@@ -160,6 +174,7 @@ onMounted(() => {
 
 .bottom-nav-item {
   flex: 1;
+  min-width: 64px;
   display: flex;
   flex-direction: column;
   gap: 2px;
