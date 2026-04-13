@@ -4,7 +4,7 @@ import { isH5, isWeixinMiniProgram } from '@/utils/platform'
 import { useUserStore } from '@/stores/user'
 import { getUserInfo } from '@/services/auth'
 
-type NavKey = 'home' | 'knowledge' | 'profile'
+type NavKey = 'home' | 'announcements' | 'partyflow' | 'knowledge' | 'profile'
 
 const props = defineProps<{
   current: NavKey
@@ -12,17 +12,23 @@ const props = defineProps<{
 
 const userStore = useUserStore()
 
-const navItems: Array<{ key: NavKey; label: string; path: string; icon: string }> = [
+const navItems: Array<{ key: NavKey; label: string; path: string; icon: string; isSubpackage?: boolean }> = [
   { key: 'home', label: '首页', path: '/pages/home/index', icon: 'home' },
-  { key: 'knowledge', label: '知识库', path: '/subpackages/knowledge/index', icon: 'category' },
+  { key: 'announcements', label: '通知', path: '/subpackages/announcements/index', icon: 'notice', isSubpackage: true },
+  { key: 'partyflow', label: '党团', path: '/subpackages/partyflow/index', icon: 'service', isSubpackage: true },
+  { key: 'knowledge', label: '知识库', path: '/subpackages/knowledge/index', icon: 'category', isSubpackage: true },
   { key: 'profile', label: '个人', path: '/pages/profile/index', icon: 'my' },
 ]
 
 const showSidebar = computed(() => isH5())
 const showBottomNav = computed(() => isWeixinMiniProgram())
 
-function goTo(path: string) {
+function goTo(path: string, isSubpackage = false) {
   if (path === `/${getCurrentPages().slice(-1)[0]?.route}`) {
+    return
+  }
+  if (isSubpackage) {
+    uni.navigateTo({ url: path })
     return
   }
   uni.reLaunch({ url: path })
@@ -60,7 +66,7 @@ onMounted(() => {
         :key="item.key"
         class="nav-item"
         :class="{ 'nav-item--active': props.current === item.key }"
-        @tap="goTo(item.path)"
+        @tap="goTo(item.path, item.isSubpackage)"
       >
         <nut-icon :name="item.icon" size="14" />
         <text>{{ item.label }}</text>
@@ -77,7 +83,7 @@ onMounted(() => {
         :key="item.key"
         class="bottom-nav-item"
         :class="{ 'bottom-nav-item--active': props.current === item.key }"
-        @tap="goTo(item.path)"
+        @tap="goTo(item.path, item.isSubpackage)"
       >
         <nut-icon :name="item.icon" size="14" />
         <text>{{ item.label }}</text>

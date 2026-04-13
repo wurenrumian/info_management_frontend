@@ -39,6 +39,34 @@
   ],
   "subPackages": [
     {
+      "root": "subpackages/announcements",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "通知"
+          }
+        },
+        {
+          "path": "detail",
+          "style": {
+            "navigationBarTitleText": "通知详情"
+          }
+        }
+      ]
+    },
+    {
+      "root": "subpackages/partyflow",
+      "pages": [
+        {
+          "path": "index",
+          "style": {
+            "navigationBarTitleText": "党团流程"
+          }
+        }
+      ]
+    },
+    {
       "root": "subpackages/knowledge",
       "pages": [
         {
