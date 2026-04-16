@@ -1,39 +1,68 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { onShow } from '@dcloudio/uni-app'
 import LayoutShell from '@/components/layout-shell.vue'
+import { getAnnouncements } from '@/services/announcements'
+import { useUserStore } from '@/stores/user'
+import { UserRole } from '@/constants/enums'
+import type { AnnouncementListItem } from '@/types/announcements'
 
-type AnnouncementItem = {
-  id: number
-  title: string
-  tag: string
-  publishAt: string
-  summary: string
+const LIMIT = 20
+
+const userStore = useUserStore()
+const announcements = ref<AnnouncementListItem[]>([])
+const total = ref(0)
+const offset = ref(0)
+const loading = ref(false)
+const error = ref('')
+const inited = ref(false)
+
+const canManage = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
+const showEmpty = computed(() => inited.value && !loading.value && !error.value && announcements.value.length === 0)
+const hasMore = computed(() => announcements.value.length < total.value)
+
+function formatPublishAt(item: AnnouncementListItem) {
+  return item.published_at || '未发布'
 }
 
-// TODO: 接入公告 API 后替换为服务层数据。
-const announcements = ref<AnnouncementItem[]>([
-  {
-    id: 101,
-    title: '2026 届就业信息填报提醒',
-    tag: '就业',
-    publishAt: '2026-04-06 10:00',
-    summary: '请相关年级同学在本周内完成填报，逾期将影响后续手续办理。',
-  },
-  {
-    id: 102,
-    title: '五一假期离校登记通知',
-    tag: '假期',
-    publishAt: '2026-04-04 09:30',
-    summary: '离校和返校均需在系统登记，外出同学请注意安全。',
-  },
-])
+function statusText(status: AnnouncementListItem['status']) {
+  if (status === 'published') {
+    return '已发布'
+  }
+  if (status === 'draft') {
+    return '草稿'
+  }
+  return '已归档'
+}
+
+async function loadAnnouncements(append = false) {
+  loading.value = true
+  error.value = ''
+  try {
+    const currentOffset = append ? offset.value : 0
+    const res = await getAnnouncements({ limit: LIMIT, offset: currentOffset })
+    total.value = res.total
+    announcements.value = append ? [...announcements.value, ...res.data] : res.data
+    offset.value = currentOffset + LIMIT
+    inited.value = true
+  } catch (e) {
+    error.value = e instanceof Error ? e.message : '加载公告失败'
+  } finally {
+    loading.value = false
+  }
+}
 
 function goDetail(id: number) {
   uni.navigateTo({ url: `/subpackages/announcements/detail?id=${id}` })
 }
-function goPublishPlaceholder() {
-  uni.showToast({ title: '发布功能待补全', icon: 'none' })
+
+function goPublish() {
+  uni.navigateTo({ url: '/subpackages/announcements/form' })
 }
+
+onShow(() => {
+  loadAnnouncements(false)
+})
 </script>
 
 <template>
@@ -42,11 +71,13 @@ function goPublishPlaceholder() {
       <content-panel title="信息发布" sub-title="学院通知、活动与事务消息">
         <template #default>
           <view class="action-row">
-            <nut-button type="primary" @click="goPublishPlaceholder">发布通知（占位）</nut-button>
-            <nut-button plain @click="goPublishPlaceholder">筛选条件（占位）</nut-button>
+            <nut-button v-if="canManage" type="primary" @click="goPublish">发布通知</nut-button>
+            <nut-button plain :loading="loading" @click="loadAnnouncements(false)">刷新列表</nut-button>
           </view>
         </template>
       </content-panel>
+
+      <nut-noticebar v-if="error" wrapable color="danger" :text="`加载失败：${error}`" />
 
       <content-panel v-if="announcements.length" title="最新通知">
         <template #default>
@@ -54,16 +85,19 @@ function goPublishPlaceholder() {
             <view v-for="item in announcements" :key="item.id" class="item-card" @click="goDetail(item.id)">
               <view class="item-header">
                 <text class="item-title">{{ item.title }}</text>
-                <nut-tag type="primary">{{ item.tag }}</nut-tag>
+                <nut-tag :type="item.status === 'published' ? 'success' : 'primary'">{{ statusText(item.status) }}</nut-tag>
               </view>
-              <text class="item-summary">{{ item.summary }}</text>
-              <text class="item-meta">发布时间：{{ item.publishAt }}</text>
+              <view class="tag-row">
+                <nut-tag v-for="tag in item.tags || []" :key="`${item.id}-${tag}`" plain type="primary">{{ tag }}</nut-tag>
+              </view>
+              <text class="item-meta">发布时间：{{ formatPublishAt(item) }}</text>
             </view>
+            <nut-button v-if="hasMore" plain :loading="loading" @click="loadAnnouncements(true)">加载更多</nut-button>
           </view>
         </template>
       </content-panel>
 
-      <content-panel v-else title="通知列表">
+      <content-panel v-else-if="showEmpty" title="通知列表">
         <template #default>
           <nut-empty image="empty" description="暂无通知" />
         </template>
@@ -113,5 +147,12 @@ function goPublishPlaceholder() {
   display: block;
   margin-top: var(--space-1);
   color: var(--color-text-secondary);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--space-2);
 }
 </style>

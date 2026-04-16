@@ -105,6 +105,12 @@
           "style": {
             "navigationBarTitleText": "通知详情"
           }
+        },
+        {
+          "path": "form",
+          "style": {
+            "navigationBarTitleText": "发布通知"
+          }
         }
       ]
     },

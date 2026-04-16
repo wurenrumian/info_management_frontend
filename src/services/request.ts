@@ -79,8 +79,13 @@ export function request<T>(options: RequestOptions): Promise<T> {
           reject(new Error('无权限'))
           return
         }
-        if (res.statusCode >= 500) {
-          reject(new Error('服务异常'))
+        if (res.statusCode === 404) {
+          reject(new Error('接口不存在'))
+          return
+        }
+        if (res.statusCode >= 400) {
+          const data = (res.data || {}) as { error?: string }
+          reject(new Error(data.error || `请求失败(${res.statusCode})`))
           return
         }
         try {

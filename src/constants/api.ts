@@ -24,6 +24,8 @@ export const API_ADMIN_KNOWLEDGE_BATCH = '/api/v1/admin/knowledge/batch'
 
 export const API_ANNOUNCEMENT_LIST = '/api/v1/announcements'
 export const API_ANNOUNCEMENT_DETAIL = '/api/v1/announcements'
+export const API_ADMIN_ANNOUNCEMENT_LIST = '/api/v1/admin/announcements'
+export const API_ADMIN_ANNOUNCEMENT_DETAIL = '/api/v1/admin/announcements'
 
 export const API_APPROVAL_SUBMIT = '/api/v1/approvals'
 export const API_APPROVAL_LIST = '/api/v1/approvals'
