@@ -14,6 +14,14 @@ export interface AnnouncementTargetScope {
   majors?: string[]
   class_ids?: number[]
   roles?: number[]
+  student_ids?: number[]
+}
+
+export interface AdminClassOption {
+  id: number
+  class_name: string
+  grade?: string
+  major?: string
 }
 
 export interface AnnouncementListItem {
@@ -39,7 +47,7 @@ export interface AnnouncementDetail {
   updated_at: string
 }
 
-export interface AnnouncementListParams extends PaginationParams {}
+export interface AnnouncementListParams extends PaginationParams { }
 
 export interface AdminAnnouncementListParams extends PaginationParams {
   status?: AnnouncementStatus

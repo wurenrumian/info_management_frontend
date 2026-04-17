@@ -2,14 +2,20 @@
 import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
 import LayoutShell from '@/components/layout-shell.vue'
-import { getAnnouncementDetail } from '@/services/announcements'
+import { getAllAnnouncementDetail, getAnnouncementDetail } from '@/services/announcements'
 import type { AnnouncementDetail } from '@/types/announcements'
 import { isH5 } from '@/utils/platform'
+import { useUserStore } from '@/stores/user'
+import { UserRole } from '@/constants/enums'
 
+const userStore = useUserStore()
 const announcementId = ref(0)
 const detail = ref<AnnouncementDetail | null>(null)
 const loading = ref(false)
 const error = ref('')
+const viewMode = ref<'student' | 'admin'>('student')
+
+const canViewAllPublished = computed(() => Number(userStore.userInfo?.role || 0) > UserRole.LEAGUE_CADRE)
 
 const title = computed(() => detail.value?.title || (announcementId.value ? `通知 #${announcementId.value}` : '通知详情'))
 
@@ -22,7 +28,10 @@ async function loadDetail() {
   loading.value = true
   error.value = ''
   try {
-    detail.value = await getAnnouncementDetail(announcementId.value)
+    const shouldUseAdminView = viewMode.value === 'admin' && canViewAllPublished.value
+    detail.value = shouldUseAdminView
+      ? await getAllAnnouncementDetail(announcementId.value)
+      : await getAnnouncementDetail(announcementId.value)
   } catch (e) {
     error.value = e instanceof Error ? e.message : '加载详情失败'
   } finally {
@@ -49,6 +58,7 @@ function openLink(url: string) {
 
 onLoad((query) => {
   announcementId.value = Number(query?.id || 0)
+  viewMode.value = query?.view_mode === 'admin' ? 'admin' : 'student'
   loadDetail()
 })
 </script>

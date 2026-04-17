@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import LayoutShell from '@/components/layout-shell.vue'
-import { getAnnouncements } from '@/services/announcements'
+import { getAllAnnouncements, getAnnouncements } from '@/services/announcements'
 import { useUserStore } from '@/stores/user'
 import { UserRole } from '@/constants/enums'
 import type { AnnouncementListItem } from '@/types/announcements'
@@ -16,8 +16,10 @@ const offset = ref(0)
 const loading = ref(false)
 const error = ref('')
 const inited = ref(false)
+const isAdminView = ref(false)
 
 const canManage = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
+const canViewAllPublished = computed(() => Number(userStore.userInfo?.role || 0) > UserRole.LEAGUE_CADRE)
 const showEmpty = computed(() => inited.value && !loading.value && !error.value && announcements.value.length === 0)
 const hasMore = computed(() => announcements.value.length < total.value)
 
@@ -40,7 +42,8 @@ async function loadAnnouncements(append = false) {
   error.value = ''
   try {
     const currentOffset = append ? offset.value : 0
-    const res = await getAnnouncements({ limit: LIMIT, offset: currentOffset })
+    const requestFn = canViewAllPublished.value && isAdminView.value ? getAllAnnouncements : getAnnouncements
+    const res = await requestFn({ limit: LIMIT, offset: currentOffset })
     total.value = res.total
     announcements.value = append ? [...announcements.value, ...res.data] : res.data
     offset.value = currentOffset + LIMIT
@@ -53,8 +56,28 @@ async function loadAnnouncements(append = false) {
 }
 
 function goDetail(id: number) {
-  uni.navigateTo({ url: `/subpackages/announcements/detail?id=${id}` })
+  const viewMode = canViewAllPublished.value && isAdminView.value ? 'admin' : 'student'
+  uni.navigateTo({ url: `/subpackages/announcements/detail?id=${id}&view_mode=${viewMode}` })
 }
+
+function toggleViewMode(value: boolean) {
+  if (!canViewAllPublished.value) {
+    return
+  }
+  isAdminView.value = value
+  announcements.value = []
+  total.value = 0
+  offset.value = 0
+  inited.value = false
+  loadAnnouncements(false)
+}
+
+watch(isAdminView, (value, oldValue) => {
+  if (value === oldValue) {
+    return
+  }
+  toggleViewMode(value)
+})
 
 function goPublish() {
   uni.navigateTo({ url: '/subpackages/announcements/form' })
@@ -74,6 +97,14 @@ onShow(() => {
             <nut-button v-if="canManage" type="primary" @click="goPublish">发布通知</nut-button>
             <nut-button plain :loading="loading" @click="loadAnnouncements(false)">刷新列表</nut-button>
           </view>
+
+          <view v-if="canViewAllPublished" class="view-mode-row">
+            <text class="view-mode-label">管理视角（查看全部已发布）</text>
+            <nut-switch v-model="isAdminView" />
+          </view>
+          <text v-if="canViewAllPublished && isAdminView" class="view-mode-hint">
+            当前为管理视角：显示全部已发布公告（不按定向范围过滤）
+          </text>
         </template>
       </content-panel>
 
@@ -115,6 +146,24 @@ onShow(() => {
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
+}
+
+.view-mode-row {
+  margin-top: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.view-mode-label,
+.view-mode-hint {
+  color: var(--color-text-secondary);
+}
+
+.view-mode-hint {
+  display: block;
+  margin-top: var(--space-1);
 }
 
 .list-wrap {

@@ -1,5 +1,6 @@
 import { request } from './request'
 import type {
+  AdminClassOption,
   AdminAnnouncementListParams,
   AnnouncementDetail,
   AnnouncementListItem,
@@ -11,6 +12,9 @@ import type {
 } from '@/types/announcements'
 import type { ListResponse } from '@/types/api'
 import {
+  API_ANNOUNCEMENT_ALL_DETAIL,
+  API_ANNOUNCEMENT_ALL_LIST,
+  API_ADMIN_CLASS_LIST,
   API_ADMIN_ANNOUNCEMENT_DETAIL,
   API_ADMIN_ANNOUNCEMENT_LIST,
   API_ANNOUNCEMENT_DETAIL,
@@ -89,6 +93,17 @@ export function getAnnouncementDetail(id: number) {
   })
 }
 
+export function getAllAnnouncements(params: AnnouncementListParams) {
+  return requestList<AnnouncementListItem>(API_ANNOUNCEMENT_ALL_LIST, params as unknown as Record<string, unknown>)
+}
+
+export function getAllAnnouncementDetail(id: number) {
+  return request<AnnouncementDetail>({
+    url: `${API_ANNOUNCEMENT_ALL_DETAIL}/${id}`,
+    method: 'GET',
+  })
+}
+
 export function getAdminAnnouncements(params: AdminAnnouncementListParams) {
   return requestList<AnnouncementListItem>(API_ADMIN_ANNOUNCEMENT_LIST, params as unknown as Record<string, unknown>)
 }
@@ -128,5 +143,12 @@ export function archiveAnnouncement(id: number) {
   return request<AnnouncementStatusMutation>({
     url: `${API_ADMIN_ANNOUNCEMENT_DETAIL}/${id}/archive`,
     method: 'POST',
+  })
+}
+
+export function getAdminClassOptions(params?: { limit?: number; offset?: number }) {
+  return requestList<AdminClassOption>(API_ADMIN_CLASS_LIST, {
+    limit: params?.limit ?? 200,
+    offset: params?.offset ?? 0,
   })
 }

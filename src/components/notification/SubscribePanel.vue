@@ -37,18 +37,8 @@ function onManualSendTap() {
 </script>
 
 <template>
-  <content-panel class="subscribe-panel" title="通知订阅" sub-title="首次订阅建议勾选“总是保持以上选择，不再询问”">
+  <content-panel class="subscribe-panel" title="通知订阅" sub-title="一键订阅系统通知（首次可勾选“不再询问”）">
     <template #default>
-      <nut-cellgroup>
-        <nut-cell
-          v-for="template in SUBSCRIBE_TEMPLATES"
-          :key="template.wechat_template_id"
-          :title="template.name"
-          :desc="template.description"
-          icon="message"
-        />
-      </nut-cellgroup>
-
       <nut-empty v-if="!isSupported" image="empty" description="仅微信小程序支持订阅消息" />
 
       <nut-button v-else type="primary" block :loading="loading" @click="onSubscribeTap">
