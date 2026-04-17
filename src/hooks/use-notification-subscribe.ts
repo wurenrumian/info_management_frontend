@@ -91,7 +91,6 @@ function getSubscribeTemplates(): SubscribeTemplateConfig[] {
       wechat_template_id: item.wechat_template_id.trim(),
     }))
     .filter((item) => item.template_code.length > 0 && item.wechat_template_id.length > 0)
-    .slice(0, 3)
 }
 
 export function useNotificationSubscribe() {
@@ -124,8 +123,13 @@ export function useNotificationSubscribe() {
     const subscribeTemplates = getSubscribeTemplates()
     const tmplIds = subscribeTemplates.map((item) => item.wechat_template_id)
 
-    if (tmplIds.length !== 3 || new Set(tmplIds).size !== 3) {
-      errorMessage.value = '订阅模板配置数量异常，请确保已配置 3 个模板 ID'
+    if (!tmplIds.length) {
+      errorMessage.value = '订阅模板未配置，请联系管理员'
+      return
+    }
+
+    if (new Set(tmplIds).size !== tmplIds.length) {
+      errorMessage.value = '订阅模板配置重复，请联系管理员检查模板 ID'
       return
     }
 

@@ -19,4 +19,11 @@ export const SUBSCRIBE_TEMPLATES: SubscribeTemplateConfig[] = [
     name: '登录成功通知',
     description: '用于提醒账号登录行为',
   },
+  {
+    template_code: 'announcement',
+    wechat_template_id: 'GBh26deOiePPxI4-0N_0URV7-XGJDhV8EViUjlyz-_Q',
+    name: '平台公告发布通知',
+    description: '用于公共通知的发布',
+  },
+
 ]
