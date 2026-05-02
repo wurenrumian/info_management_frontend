@@ -36,8 +36,10 @@ export const API_APPROVAL_ME_LIST = '/api/v1/approvals/me'
 export const API_APPROVAL_DETAIL = '/api/v1/approvals'
 export const API_APPROVAL_ACTION = '/api/v1/approvals'
 
-export const API_PARTYFLOW_PROGRESS = '/api/v1/partyflow/progress'
-export const API_PARTYFLOW_REMINDERS = '/api/v1/partyflow/reminders'
+export const API_PARTYFLOW_ME = '/api/v1/partyflow/me'
+export const API_ADMIN_PARTYFLOW_STATUSES = '/api/v1/admin/partyflow/statuses'
+export const API_ADMIN_PARTYFLOW_RULES = '/api/v1/admin/partyflow/reminder-rules'
+export const API_ADMIN_PARTYFLOW_SCAN_REMINDERS = '/api/v1/admin/partyflow/reminders/scan'
 
 export const API_FILE_UPLOAD = '/api/v1/files/upload'
 export const API_FILE_DOWNLOAD = '/api/v1/files'
