@@ -3,12 +3,14 @@ import type { ApprovalStatus } from '@/constants/enums'
 export interface Approval {
   id: number
   applicant_id: number
-  type: string
+  approval_type: string
+  title: string
   status: ApprovalStatus
   form_data: Record<string, unknown>
-  current_approver_id: number
-  history: ApprovalHistoryEntry[]
-  semester: string
+  current_approver_id?: number
+  history?: ApprovalHistoryEntry[]
+  semester?: string
+  submitted_at?: string
   created_at: string
   updated_at: string
 }
@@ -21,7 +23,31 @@ export interface ApprovalHistoryEntry {
 }
 
 export interface ApprovalSubmitParams {
-  type: string
+  approval_type: string
+  title: string
   form_data: Record<string, unknown>
-  semester: string
+  attachment_file_ids?: number[]
+  template_file_id?: number
+  semester?: string
+}
+
+export interface ApprovalAction {
+  id?: number
+  action: string
+  operator_id?: number
+  comment?: string
+  created_at?: string
+}
+
+export interface CertificateRecordRef {
+  id: number
+  type?: string
+  status?: string
+  created_at?: string
+}
+
+export interface ApprovalDetail {
+  approval: Approval
+  actions: ApprovalAction[]
+  certificate_records: CertificateRecordRef[]
 }
