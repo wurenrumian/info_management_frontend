@@ -1,7 +1,14 @@
 import { request } from './request'
-import type { Approval, ApprovalSubmitParams } from '@/types/approvals'
+import type { Approval, ApprovalDetail, ApprovalSubmitParams } from '@/types/approvals'
 import type { ListResponse, PaginationParams } from '@/types/api'
-import { API_APPROVAL_SUBMIT, API_APPROVAL_LIST, API_APPROVAL_ME_LIST, API_APPROVAL_DETAIL, API_APPROVAL_ACTION } from '@/constants/api'
+import {
+  API_APPROVAL_SUBMIT,
+  API_APPROVAL_LIST,
+  API_APPROVAL_ME_LIST,
+  API_APPROVAL_DETAIL,
+  API_APPROVAL_REVIEW,
+  API_APPROVAL_WITHDRAW,
+} from '@/constants/api'
 
 export function submitApproval(data: ApprovalSubmitParams) {
   return request<Approval>({
@@ -28,7 +35,7 @@ export function getMyApprovalList(params: PaginationParams & { status?: string }
 }
 
 export function getApprovalDetail(id: number) {
-  return request<Approval>({
+  return request<ApprovalDetail>({
     url: `${API_APPROVAL_DETAIL}/${id}`,
     method: 'GET',
   })
@@ -36,7 +43,7 @@ export function getApprovalDetail(id: number) {
 
 export function approveApproval(id: number, action: 'approve' | 'reject', comment?: string) {
   return request<Approval>({
-    url: `${API_APPROVAL_ACTION}/${id}/action`,
+    url: `${API_APPROVAL_REVIEW}/${id}/review`,
     method: 'POST',
     data: { action, comment },
   })
@@ -44,7 +51,7 @@ export function approveApproval(id: number, action: 'approve' | 'reject', commen
 
 export function withdrawApproval(id: number) {
   return request<Approval>({
-    url: `${API_APPROVAL_ACTION}/${id}/withdraw`,
+    url: `${API_APPROVAL_WITHDRAW}/${id}/withdraw`,
     method: 'POST',
   })
 }

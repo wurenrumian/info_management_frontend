@@ -1,16 +1,58 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
 import LayoutShell from '@/components/layout-shell.vue'
+import { submitApproval } from '@/services/approvals'
 
 const formState = reactive({
-  type: '请假申请',
+  approvalType: 'leave',
   title: '',
   reason: '',
+  startAt: '',
+  endAt: '',
+  contactPhone: '',
+  semester: '',
 })
 
-function submitPlaceholder() {
-  // TODO: 接入 submitApproval，提交后跳转 detail 页面。
-  uni.showToast({ title: '提交逻辑待补全', icon: 'none' })
+async function submitForm() {
+  if (!formState.title.trim()) {
+    uni.showToast({ title: '请填写申请标题', icon: 'none' })
+    return
+  }
+  if (!formState.reason.trim()) {
+    uni.showToast({ title: '请填写申请说明', icon: 'none' })
+    return
+  }
+  if (!formState.startAt.trim() || !formState.endAt.trim()) {
+    uni.showToast({ title: '请填写起止时间', icon: 'none' })
+    return
+  }
+  if (!formState.contactPhone.trim()) {
+    uni.showToast({ title: '请填写联系电话', icon: 'none' })
+    return
+  }
+
+  try {
+    const res = await submitApproval({
+      approval_type: formState.approvalType,
+      title: formState.title.trim(),
+      form_data: {
+        reason: formState.reason.trim(),
+        start_at: formState.startAt.trim(),
+        end_at: formState.endAt.trim(),
+        contact_phone: formState.contactPhone.trim(),
+      },
+      semester: formState.semester.trim() || undefined,
+    })
+    uni.showToast({ title: '提交成功', icon: 'success' })
+    if (res.id) {
+      uni.redirectTo({ url: `/subpackages/approvals/detail?id=${res.id}` })
+      return
+    }
+    uni.navigateBack()
+  } catch (e) {
+    const message = e instanceof Error ? e.message : '提交失败，请稍后重试'
+    uni.showToast({ title: message, icon: 'none' })
+  }
 }
 </script>
 
@@ -21,7 +63,7 @@ function submitPlaceholder() {
         <template #default>
           <view class="field">
             <text class="label">申请类型</text>
-            <nut-input v-model="formState.type" readonly />
+            <nut-input v-model="formState.approvalType" placeholder="例如：leave / stamp / certificate" />
           </view>
 
           <view class="field">
@@ -34,7 +76,27 @@ function submitPlaceholder() {
             <nut-textarea v-model="formState.reason" placeholder="请填写详细原因" maxlength="300" />
           </view>
 
-          <nut-button type="primary" block @click="submitPlaceholder">提交申请（占位）</nut-button>
+          <view class="field">
+            <text class="label">开始时间</text>
+            <nut-input v-model="formState.startAt" placeholder="例如：2026-04-10 08:30" />
+          </view>
+
+          <view class="field">
+            <text class="label">结束时间</text>
+            <nut-input v-model="formState.endAt" placeholder="例如：2026-04-10 18:00" />
+          </view>
+
+          <view class="field">
+            <text class="label">联系电话</text>
+            <nut-input v-model="formState.contactPhone" type="number" placeholder="请填写手机号" maxlength="20" />
+          </view>
+
+          <view class="field">
+            <text class="label">学期（可选）</text>
+            <nut-input v-model="formState.semester" placeholder="例如：2025-2026-2" />
+          </view>
+
+          <nut-button type="primary" block @click="submitForm">提交申请</nut-button>
         </template>
       </content-panel>
     </view>
