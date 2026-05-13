@@ -145,6 +145,42 @@
           "style": {
             "navigationBarTitleText": "党团流程"
           }
+        },
+        {
+          "path": "admin/index",
+          "style": {
+            "navigationBarTitleText": "党团流程管理"
+          }
+        },
+        {
+          "path": "admin/detail",
+          "style": {
+            "navigationBarTitleText": "流程详情"
+          }
+        },
+        {
+          "path": "admin/form",
+          "style": {
+            "navigationBarTitleText": "编辑流程状态"
+          }
+        },
+        {
+          "path": "admin/import",
+          "style": {
+            "navigationBarTitleText": "批量导入"
+          }
+        },
+        {
+          "path": "admin/rules",
+          "style": {
+            "navigationBarTitleText": "提醒规则"
+          }
+        },
+        {
+          "path": "admin/scan",
+          "style": {
+            "navigationBarTitleText": "扫描提醒"
+          }
         }
       ]
     },
