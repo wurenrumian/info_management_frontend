@@ -37,6 +37,7 @@ export const API_APPROVAL_DETAIL = '/api/v1/approvals'
 export const API_APPROVAL_REVIEW = '/api/v1/admin/approvals'
 export const API_APPROVAL_WITHDRAW = '/api/v1/approvals'
 
+export const API_PARTYFLOW_ME = '/api/v1/partyflow/me'
 export const API_PARTYFLOW_PROGRESS = '/api/v1/partyflow/progress'
 export const API_PARTYFLOW_REMINDERS = '/api/v1/partyflow/reminders'
 
