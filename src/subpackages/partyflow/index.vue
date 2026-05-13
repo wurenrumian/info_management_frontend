@@ -5,6 +5,8 @@ import LayoutShell from '@/components/layout-shell.vue'
 import { getPartyflowMine } from '@/services/partyflow'
 import type { PartyflowEvent, PartyflowMyStatus } from '@/types/partyflow'
 import { compareIsoDesc, formatDateTime } from '@/utils/partyflow'
+import { useUserStore } from '@/stores/user'
+import { UserRole } from '@/constants/enums'
 
 const STAGE_ORDER: Record<string, string[]> = {
   party: ['none', 'applicant', 'activist', 'development_target', 'probationary_member', 'full_member'],
@@ -48,6 +50,9 @@ const loading = ref(false)
 const error = ref('')
 const statuses = ref<PartyflowMyStatus[]>([])
 const expandedHistory = ref<Record<number, boolean>>({})
+
+const userStore = useUserStore()
+const canManage = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
 
 const reminderEvents = computed(() => {
   const out: Array<PartyflowEvent & { org_type: string }> = []
@@ -144,6 +149,10 @@ async function loadPartyflow() {
   }
 }
 
+function goAdmin() {
+  uni.navigateTo({ url: '/subpackages/partyflow/admin/index' })
+}
+
 onShow(() => {
   loadPartyflow()
 })
@@ -159,7 +168,10 @@ onPullDownRefresh(() => {
       <content-panel title="党团流程" sub-title="展示当前阶段与关键节点提醒">
         <template #default>
           <text class="intro">可查看你在党组织/团组织中的当前阶段、历史事件与提醒记录。</text>
-          <nut-button plain :loading="loading" @click="loadPartyflow">刷新</nut-button>
+          <view class="action-row">
+            <nut-button v-if="canManage" type="primary" @click="goAdmin">管理</nut-button>
+            <nut-button plain :loading="loading" @click="loadPartyflow">刷新</nut-button>
+          </view>
         </template>
       </content-panel>
 
@@ -234,6 +246,13 @@ onPullDownRefresh(() => {
   display: block;
   color: var(--color-text-secondary);
   line-height: 1.7;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .meta {
