@@ -6,8 +6,10 @@ export interface Approval {
   approval_type: string
   title: string
   status: ApprovalStatus
+  current_step?: string
   form_data: Record<string, unknown>
   current_approver_id?: number
+  due_at?: string
   history?: ApprovalHistoryEntry[]
   semester?: string
   submitted_at?: string
@@ -33,8 +35,12 @@ export interface ApprovalSubmitParams {
 
 export interface ApprovalAction {
   id?: number
-  action: string
+  action?: string
+  action_type?: string
   operator_id?: number
+  operator_name?: string
+  from_status?: string
+  to_status?: string
   comment?: string
   created_at?: string
 }

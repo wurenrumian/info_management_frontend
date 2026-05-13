@@ -12,17 +12,7 @@ type QuickEntry = {
 const quickEntries: QuickEntry[] = [
   { title: '审批流程', desc: '发起或处理审批', icon: 'checked', path: '/subpackages/approvals/index' },
   { title: '电子证件', desc: '申请与记录查询', icon: 'tips', path: '/subpackages/certificates/index' },
-  { title: '知识库', desc: '问答与资料检索', icon: 'category', path: '/subpackages/knowledge/index' },
-  { title: '信息发布', desc: '查看学院通知', icon: 'message', path: '/subpackages/announcements/index' },
-  { title: '党团流程', desc: '阶段追踪与提醒', icon: 'notice', path: '/subpackages/partyflow/index' },
-  { title: '个人中心', desc: '资料与账号设置', icon: 'my', path: '/pages/profile/index' },
 ]
-
-function goToStyleShowcase() {
-  uni.navigateTo({
-    url: '/pages/style-showcase/index',
-  })
-}
 
 function goToPath(path: string) {
   if (path.startsWith('/pages/')) {
@@ -50,10 +40,6 @@ function goToProfile() {
                 <nut-icon name="my" />
                 <text class="btn-text">前往个人主页</text>
               </nut-button>
-              <nut-button plain block @click="goToStyleShowcase">
-                <nut-icon name="tips" />
-                <text class="btn-text">查看样式预览页</text>
-              </nut-button>
             </view>
           </template>
         </content-panel>
@@ -69,7 +55,6 @@ function goToProfile() {
                 <text class="quick-card__desc">{{ item.desc }}</text>
               </view>
             </view>
-            <nut-cell title="风格验收页" is-link icon="service" @click="goToStyleShowcase" />
           </template>
         </content-panel>
 

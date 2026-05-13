@@ -1,13 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { onShow } from '@dcloudio/uni-app'
 import LayoutShell from '@/components/layout-shell.vue'
 import { getMyApprovalList } from '@/services/approvals'
 import type { Approval } from '@/types/approvals'
+import { useUserStore } from '@/stores/user'
+import { UserRole } from '@/constants/enums'
 
 const myApplications = ref<Approval[]>([])
 const loading = ref(false)
 const error = ref('')
+const userStore = useUserStore()
+
+const canOpenAdminPanel = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
 
 function formatStatus(status: string) {
   switch (status) {
@@ -45,6 +50,10 @@ function goCreate() {
   uni.navigateTo({ url: '/subpackages/approvals/form' })
 }
 
+function goAdminPanel() {
+  uni.navigateTo({ url: '/subpackages/approvals/admin/index' })
+}
+
 function goDetail(id: number) {
   uni.navigateTo({ url: `/subpackages/approvals/detail?id=${id}` })
 }
@@ -59,7 +68,10 @@ onShow(() => {
     <view class="page-container approvals-page">
       <content-panel title="审批流程" sub-title="请假、盖章等申请与审批入口">
         <template #default>
-          <nut-button type="primary" @click="goCreate">发起新申请</nut-button>
+          <view class="action-row">
+            <nut-button type="primary" @click="goCreate">发起新申请</nut-button>
+            <nut-button v-if="canOpenAdminPanel" plain @click="goAdminPanel">审批管理面板</nut-button>
+          </view>
         </template>
       </content-panel>
 
@@ -84,6 +96,12 @@ onShow(() => {
 <style scoped lang="scss">
 .approvals-page {
   min-height: 100vh;
+}
+
+.action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 :deep(.nut-button) {
