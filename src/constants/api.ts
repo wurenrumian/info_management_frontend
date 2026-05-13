@@ -36,6 +36,8 @@ export const API_APPROVAL_ME_LIST = '/api/v1/approvals/me'
 export const API_APPROVAL_DETAIL = '/api/v1/approvals'
 export const API_APPROVAL_REVIEW = '/api/v1/admin/approvals'
 export const API_APPROVAL_WITHDRAW = '/api/v1/approvals'
+export const API_ADMIN_APPROVAL_LIST = '/api/v1/admin/approvals'
+export const API_ADMIN_APPROVAL_DETAIL = '/api/v1/admin/approvals'
 
 export const API_PARTYFLOW_ME = '/api/v1/partyflow/me'
 export const API_ADMIN_PARTYFLOW_STATUSES = '/api/v1/admin/partyflow/statuses'

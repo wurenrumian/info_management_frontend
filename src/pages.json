@@ -124,6 +124,12 @@
           }
         },
         {
+          "path": "admin/index",
+          "style": {
+            "navigationBarTitleText": "审批管理"
+          }
+        },
+        {
           "path": "form",
           "style": {
             "navigationBarTitleText": "发起申请"
