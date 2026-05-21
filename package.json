@@ -8,7 +8,8 @@
     "dev:h5": "uni",
     "build:h5": "uni build",
     "type-check": "vue-tsc --noEmit",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
+    "lint:fix": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix"
   },
   "dependencies": {
     "@dcloudio/uni-app": "3.0.0-5000620260331001",
@@ -30,9 +31,14 @@
     "@types/node": "^22.13.4",
     "@vue/runtime-core": "^3.4.21",
     "@vue/tsconfig": "^0.7.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-vue": "^9.33.0",
     "sass": "^1.98.0",
     "typescript": "~5.7.3",
     "vite": "5.2.8",
+    "vue-eslint-parser": "^9.4.3",
     "vue-tsc": "^2.2.8"
   },
   "engines": {
