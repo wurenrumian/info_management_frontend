@@ -1,40 +1,25 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
 import LayoutShell from '@/components/layout-shell.vue'
 
-const formState = reactive({
-  type: '在读证明',
-  purpose: '',
-  notes: '',
-})
+function goCreateApproval() {
+  uni.redirectTo({ url: '/subpackages/approvals/form' })
+}
 
-function submitPlaceholder() {
-  // TODO: 接入证件申请 API，提交后写入 records 列表。
-  uni.showToast({ title: '申请逻辑待补全', icon: 'none' })
+function goRecords() {
+  uni.redirectTo({ url: '/subpackages/certificates/records' })
 }
 </script>
 
 <template>
   <layout-shell current="certificates">
     <view class="page-container certificate-form-page">
-      <content-panel title="证件申请" sub-title="在线填报申请信息（占位）">
+      <content-panel title="证件生成" sub-title="证件由审批流程自动生成">
         <template #default>
-          <view class="field">
-            <text class="label">证件类型</text>
-            <nut-input v-model="formState.type" readonly />
+          <text class="intro">当前后端未提供“单独提交证件申请”的接口。请通过提交审批（leave/budget）来触发证件生成。</text>
+          <view class="action-row">
+            <nut-button type="primary" @click="goCreateApproval">去发起审批</nut-button>
+            <nut-button plain @click="goRecords">查看我的证件</nut-button>
           </view>
-
-          <view class="field">
-            <text class="label">用途说明</text>
-            <nut-input v-model="formState.purpose" placeholder="例如：奖学金申请、实习材料提交" maxlength="60" />
-          </view>
-
-          <view class="field">
-            <text class="label">补充备注</text>
-            <nut-textarea v-model="formState.notes" placeholder="可填写时间要求、份数等" maxlength="200" />
-          </view>
-
-          <nut-button type="primary" block @click="submitPlaceholder">提交申请（占位）</nut-button>
         </template>
       </content-panel>
     </view>
@@ -46,17 +31,20 @@ function submitPlaceholder() {
   min-height: 100vh;
 }
 
-.field + .field {
-  margin-top: var(--space-3);
+.intro {
+  display: block;
+  color: var(--color-text-secondary);
+  line-height: 1.7;
 }
 
-.label {
-  display: block;
-  margin-bottom: var(--space-1);
-  color: var(--color-text-secondary);
+.action-row {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: var(--space-3);
 }
 
 :deep(.nut-button) {
-  margin-top: var(--space-3);
+  margin: 0;
 }
 </style>

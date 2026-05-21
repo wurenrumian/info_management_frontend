@@ -9,7 +9,11 @@ import {
   API_APPROVAL_REVIEW,
   API_APPROVAL_WITHDRAW,
   API_ADMIN_APPROVAL_LIST,
-  API_ADMIN_APPROVAL_DETAIL,
+  API_ADMIN_APPROVAL_ASSIGN,
+  API_ADMIN_APPROVAL_REMIND,
+  API_ADMIN_APPROVAL_SCAN_OVERDUE,
+  API_ADMIN_APPROVAL_APPLICATION_PDF_REGENERATE,
+  API_ADMIN_APPROVAL_CERTIFICATE_REGENERATE,
 } from '@/constants/api'
 
 interface ApprovalListEnvelope<T> {
@@ -112,7 +116,7 @@ export function getApprovalDetail(id: number) {
 export function approveApproval(id: number, action: 'approve' | 'reject', comment?: string) {
   return request<Approval>({
     url: `${API_APPROVAL_REVIEW}/${id}/review`,
-    method: 'PATCH',
+    method: 'POST',
     data: { action, comment },
   })
 }
@@ -130,7 +134,44 @@ export function getAdminApprovalList(params: PaginationParams & { status?: strin
 
 export function getAdminApprovalDetail(id: number) {
   return request<ApprovalDetail>({
-    url: `${API_ADMIN_APPROVAL_DETAIL}/${id}`,
+    url: `${API_APPROVAL_DETAIL}/${id}`,
     method: 'GET',
+  })
+}
+
+export function assignApproval(id: number, approver_id: number, comment?: string) {
+  return request<Approval>({
+    url: `${API_ADMIN_APPROVAL_ASSIGN}/${id}/assign`,
+    method: 'POST',
+    data: { approver_id, comment },
+  })
+}
+
+export function remindApproval(id: number, comment?: string) {
+  return request<Record<string, unknown>>({
+    url: `${API_ADMIN_APPROVAL_REMIND}/${id}/remind`,
+    method: 'POST',
+    data: { comment },
+  })
+}
+
+export function scanOverdueApprovals() {
+  return request<Record<string, unknown>>({
+    url: API_ADMIN_APPROVAL_SCAN_OVERDUE,
+    method: 'POST',
+  })
+}
+
+export function regenerateApplicationPdf(id: number) {
+  return request<Record<string, unknown>>({
+    url: `${API_ADMIN_APPROVAL_APPLICATION_PDF_REGENERATE}/${id}/application-pdf/regenerate`,
+    method: 'POST',
+  })
+}
+
+export function regenerateApprovalCertificate(id: number) {
+  return request<Record<string, unknown>>({
+    url: `${API_ADMIN_APPROVAL_CERTIFICATE_REGENERATE}/${id}/certificate/regenerate`,
+    method: 'POST',
   })
 }
