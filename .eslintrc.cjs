@@ -1,0 +1,38 @@
+module.exports = {
+  root: true,
+  env: {
+    browser: true,
+    node: true,
+    es2022: true,
+    'vue/setup-compiler-macros': true,
+  },
+  globals: {
+    uni: 'readonly',
+    wx: 'readonly',
+    App: 'readonly',
+    Page: 'readonly',
+    getApp: 'readonly',
+    getCurrentPages: 'readonly',
+    plus: 'readonly',
+    defineProps: 'readonly',
+    defineEmits: 'readonly',
+    defineExpose: 'readonly',
+    withDefaults: 'readonly',
+  },
+  parser: 'vue-eslint-parser',
+  parserOptions: {
+    ecmaVersion: 2022,
+    sourceType: 'module',
+    parser: '@typescript-eslint/parser',
+    extraFileExtensions: ['.vue'],
+  },
+  plugins: ['vue', '@typescript-eslint'],
+  extends: ['eslint:recommended', 'plugin:vue/vue3-essential'],
+  rules: {
+    'no-undef': 'off',
+    'no-constant-condition': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    'vue/multi-word-component-names': 'off',
+  },
+}

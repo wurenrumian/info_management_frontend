@@ -79,13 +79,9 @@ export function request<T>(options: RequestOptions): Promise<T> {
           reject(new Error('无权限'))
           return
         }
-        if (res.statusCode === 404) {
-          reject(new Error('接口不存在'))
-          return
-        }
         if (res.statusCode >= 400) {
           const data = (res.data || {}) as { error?: string }
-          reject(new Error(data.error || `请求失败(${res.statusCode})`))
+          reject(new Error(data.error || (res.statusCode === 404 ? '资源不存在(404)' : `请求失败(${res.statusCode})`)))
           return
         }
         try {
@@ -96,7 +92,8 @@ export function request<T>(options: RequestOptions): Promise<T> {
         }
       },
       fail: (err) => {
-        reject(err)
+        const anyErr = err as { errMsg?: string }
+        reject(new Error(anyErr?.errMsg || '网络请求失败'))
       },
     })
   })

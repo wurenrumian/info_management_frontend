@@ -216,6 +216,12 @@
           "style": {
             "navigationBarTitleText": "证件详情"
           }
+        },
+        {
+          "path": "admin/templates",
+          "style": {
+            "navigationBarTitleText": "证书模板管理"
+          }
         }
       ]
     }
