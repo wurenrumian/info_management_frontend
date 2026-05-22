@@ -9,6 +9,9 @@ const records = ref<CertificateRecord[]>([])
 const loading = ref(false)
 const error = ref('')
 const filterApprovalType = ref<'all' | 'leave' | 'budget'>('all')
+const total = ref(0)
+const limit = 20
+const offset = ref(0)
 
 function stageLabel(stage: string) {
   return stage === 'application' ? '申请材料' : stage === 'approval_certificate' ? '审批凭证' : stage || '-'
@@ -20,21 +23,37 @@ function statusLabel(status: string) {
   return status === 'generated' ? '已生成' : status === 'failed' ? '生成失败' : status === 'revoked' ? '已作废' : status || '-'
 }
 
-async function fetchRecords() {
+async function fetchRecords(reset = true) {
+  if (reset) {
+    offset.value = 0
+  }
   loading.value = true
   error.value = ''
   try {
     const res = await getMyCertificateList({
-      limit: 20,
-      offset: 0,
+      limit,
+      offset: offset.value,
       approval_type: filterApprovalType.value === 'all' ? undefined : filterApprovalType.value,
     })
-    records.value = res.data || []
+    total.value = Number(res.total || 0)
+    const next = res.data || []
+    records.value = reset ? next : records.value.concat(next)
   } catch (e) {
     error.value = e instanceof Error ? e.message : '加载证件记录失败'
   } finally {
     loading.value = false
   }
+}
+
+function changeFilter(next: 'all' | 'leave' | 'budget') {
+  filterApprovalType.value = next
+  fetchRecords(true)
+}
+
+function loadMore() {
+  if (loading.value || records.value.length >= total.value) return
+  offset.value += limit
+  fetchRecords(false)
 }
 
 function goDetail(id: number) {
@@ -52,10 +71,11 @@ onShow(() => {
       <content-panel title="我的证件" sub-title="申请材料与审批凭证记录">
         <template #default>
           <view class="filter-row">
-            <nut-button size="small" :type="filterApprovalType === 'all' ? 'primary' : 'default'" @click="filterApprovalType = 'all'; fetchRecords()">全部</nut-button>
-            <nut-button size="small" :type="filterApprovalType === 'leave' ? 'primary' : 'default'" @click="filterApprovalType = 'leave'; fetchRecords()">请假</nut-button>
-            <nut-button size="small" :type="filterApprovalType === 'budget' ? 'primary' : 'default'" @click="filterApprovalType = 'budget'; fetchRecords()">预算</nut-button>
+            <nut-button size="small" :type="filterApprovalType === 'all' ? 'primary' : 'default'" @click="changeFilter('all')">全部</nut-button>
+            <nut-button size="small" :type="filterApprovalType === 'leave' ? 'primary' : 'default'" @click="changeFilter('leave')">请假</nut-button>
+            <nut-button size="small" :type="filterApprovalType === 'budget' ? 'primary' : 'default'" @click="changeFilter('budget')">预算</nut-button>
           </view>
+          <text v-if="total" class="summary">共 {{ total }} 条，当前显示 {{ records.length }} 条</text>
           <nut-noticebar v-if="error" wrapable color="danger" :text="`加载失败：${error}`" />
           <nut-cell
             v-for="item in records"
@@ -66,6 +86,9 @@ onShow(() => {
             is-link
             @click="goDetail(item.id)"
           />
+          <view v-if="records.length < total" class="more-row">
+            <nut-button plain :loading="loading" @click="loadMore">加载更多</nut-button>
+          </view>
           <nut-empty v-if="!loading && !records.length && !error" image="empty" description="暂无证件记录" />
         </template>
       </content-panel>
@@ -83,5 +106,15 @@ onShow(() => {
   flex-wrap: wrap;
   gap: var(--space-2);
   margin-bottom: var(--space-2);
+}
+
+.summary {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--color-text-secondary);
+}
+
+.more-row {
+  margin-top: var(--space-2);
 }
 </style>

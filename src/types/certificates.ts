@@ -18,9 +18,15 @@ export interface CertificateRecord {
 }
 
 export interface CertificateVerifyResult {
-  valid: boolean
-  certificate?: CertificateRecord
-  message?: string
+  record_id: number
+  approval_id?: number
+  applicant_id?: number
+  approval_type?: 'leave' | 'budget' | string
+  document_stage: 'application' | 'approval_certificate' | string
+  certificate_no?: string
+  verification_code?: string
+  status: 'generated' | 'failed' | 'revoked' | string
+  generated_at?: string
 }
 
 export interface CertificateTemplate {
