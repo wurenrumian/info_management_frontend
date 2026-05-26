@@ -7,6 +7,7 @@ import { bindKnowledgeAttachments, detachKnowledgeAttachment, getKnowledgeAttach
 import type { KnowledgeAttachment } from '@/types/knowledge'
 import { useUserStore } from '@/stores/user'
 import { UserRole } from '@/constants/enums'
+import { pickDocumentFiles } from '@/utils/file-picker'
 
 const LIMIT = 50
 
@@ -76,35 +77,6 @@ async function bindSelected() {
   }
 }
 
-function pickLocalFiles() {
-  const chooser = (uni as unknown as { chooseMessageFile?: Function; chooseFile?: Function })
-  return new Promise<Array<{ path: string; name: string }>>((resolve, reject) => {
-    const onSuccess = (res: { tempFiles?: Array<{ name?: string; path?: string; size?: number }> }) => {
-      const picked = (res.tempFiles || [])
-        .map((item) => ({
-          name: String(item.name || ''),
-          path: String(item.path || ''),
-        }))
-        .filter((item) => item.path)
-      resolve(picked)
-    }
-
-    const onFail = (err: unknown) => reject(err)
-
-    if (typeof chooser.chooseMessageFile === 'function') {
-      chooser.chooseMessageFile({ count: 10, type: 'file', success: onSuccess, fail: onFail })
-      return
-    }
-
-    if (typeof chooser.chooseFile === 'function') {
-      chooser.chooseFile({ count: 10, type: 'all', success: onSuccess, fail: onFail })
-      return
-    }
-
-    reject(new Error('当前端不支持文件选择'))
-  })
-}
-
 async function uploadAndRefresh() {
   if (!hasPermission.value) {
     return
@@ -112,13 +84,13 @@ async function uploadAndRefresh() {
 
   uploading.value = true
   try {
-    const picked = await pickLocalFiles()
+    const picked = await pickDocumentFiles(10)
     if (picked.length === 0) {
       return
     }
 
     for (const item of picked) {
-      await uploadFile(item.path, 'knowledge')
+      await uploadFile(item.file || item.path, 'knowledge')
     }
 
     uni.showToast({ title: `上传成功 ${picked.length} 个`, icon: 'success' })

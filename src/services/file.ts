@@ -42,26 +42,28 @@ function toUploadedFile(payload: unknown): UploadedFile {
   }
 }
 
-export function uploadFile(filePath: string, scene?: UploadScene) {
+export function uploadFile(filePath: string | File, scene?: UploadScene) {
   return new Promise<UploadedFile>((resolve, reject) => {
+    const isFileObject = typeof File !== 'undefined' && filePath instanceof File
+
     uni.uploadFile({
       url: resolveApiUrl(API_FILE_UPLOAD),
-      filePath,
       name: 'file',
       formData: scene ? { scene } : undefined,
       header: {
         Authorization: `Bearer ${uni.getStorageSync('token') || ''}`,
       },
+      ...(isFileObject ? { file: filePath } : { filePath: String(filePath) }),
       success: (res) => {
-        const data = JSON.parse(res.data)
-        if (data.error) {
-          reject(new Error(data.error))
-        } else {
-          try {
-            resolve(toUploadedFile(data.data))
-          } catch (e) {
-            reject(e)
+        try {
+          const data = JSON.parse(res.data)
+          if (data.error) {
+            reject(new Error(data.error))
+            return
           }
+          resolve(toUploadedFile(data.data))
+        } catch (e) {
+          reject(e)
         }
       },
       fail: reject,
