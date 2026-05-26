@@ -1,5 +1,3 @@
-import { isH5 } from './platform'
-
 export interface PickedLocalFile {
   name: string
   path: string
@@ -123,7 +121,7 @@ function pickFromUniChooser(count: number): Promise<PickedLocalFile[]> {
       return
     }
 
-    if (isH5() && typeof document !== 'undefined') {
+    if (typeof document !== 'undefined' && typeof window !== 'undefined') {
       pickFromH5Input(count).then(resolve).catch(reject)
       return
     }
