@@ -89,11 +89,27 @@ async function uploadAndRefresh() {
       return
     }
 
+    let successCount = 0
+    let failCount = 0
+    let lastError = ''
     for (const item of picked) {
-      await uploadFile(item.file || item.path, 'knowledge')
+      try {
+        await uploadFile(item.file || item.path, 'knowledge')
+        successCount += 1
+      } catch (e) {
+        failCount += 1
+        lastError = e instanceof Error ? e.message : '上传失败'
+      }
     }
 
-    uni.showToast({ title: `上传成功 ${picked.length} 个`, icon: 'success' })
+    if (successCount > 0 && failCount === 0) {
+      uni.showToast({ title: `上传成功 ${successCount} 个`, icon: 'success' })
+    } else if (successCount > 0) {
+      uni.showToast({ title: `成功 ${successCount} 个，失败 ${failCount} 个`, icon: 'none' })
+    } else {
+      throw new Error(lastError || '上传失败')
+    }
+
     const filesRes = await getFileList({ limit: LIMIT, offset: 0 })
     uploadedFiles.value = filesRes.data
   } catch (e) {
