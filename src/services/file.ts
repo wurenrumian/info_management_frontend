@@ -43,9 +43,11 @@ function toUploadedFile(payload: unknown): UploadedFile {
 }
 
 export function uploadFile(filePath: string | File, scene?: UploadScene) {
-  return new Promise<UploadedFile>((resolve, reject) => {
-    const isFileObject = typeof File !== 'undefined' && filePath instanceof File
+  if (typeof File !== 'undefined' && filePath instanceof File && typeof fetch === 'function' && typeof FormData !== 'undefined') {
+    return uploadFileWithFetch(filePath, scene)
+  }
 
+  return new Promise<UploadedFile>((resolve, reject) => {
     uni.uploadFile({
       url: resolveApiUrl(API_FILE_UPLOAD),
       name: 'file',
@@ -53,15 +55,26 @@ export function uploadFile(filePath: string | File, scene?: UploadScene) {
       header: {
         Authorization: `Bearer ${uni.getStorageSync('token') || ''}`,
       },
-      ...(isFileObject ? { file: filePath } : { filePath: String(filePath) }),
+      filePath: String(filePath),
       success: (res) => {
         try {
-          const data = JSON.parse(res.data)
-          if (data.error) {
-            reject(new Error(data.error))
+          if (res.statusCode === 401) {
+            uni.removeStorageSync('token')
+            uni.redirectTo({ url: '/pages/auth/login' })
+            reject(new Error('未登录'))
             return
           }
-          resolve(toUploadedFile(data.data))
+          if (res.statusCode === 403) {
+            reject(new Error('无权限'))
+            return
+          }
+          if (res.statusCode >= 400) {
+            reject(new Error(`上传失败(${res.statusCode})`))
+            return
+          }
+
+          const payload = parseUploadResponse(res.data)
+          resolve(toUploadedFile(payload))
         } catch (e) {
           reject(e)
         }
@@ -69,6 +82,73 @@ export function uploadFile(filePath: string | File, scene?: UploadScene) {
       fail: reject,
     })
   })
+}
+
+async function uploadFileWithFetch(file: File, scene?: UploadScene): Promise<UploadedFile> {
+  const token = String(uni.getStorageSync('token') || '')
+  const formData = new FormData()
+  formData.append('file', file, file.name)
+  if (scene) {
+    formData.append('scene', scene)
+  }
+
+  const res = await fetch(resolveApiUrl(API_FILE_UPLOAD), {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body: formData,
+  })
+
+  if (res.status === 401) {
+    uni.removeStorageSync('token')
+    uni.redirectTo({ url: '/pages/auth/login' })
+    throw new Error('未登录')
+  }
+
+  if (res.status === 403) {
+    throw new Error('无权限')
+  }
+
+  const text = await res.text()
+  if (res.status >= 400) {
+    throw new Error(parseUploadError(text) || `上传失败(${res.status})`)
+  }
+
+  const payload = parseUploadResponse(text)
+  return toUploadedFile(payload)
+}
+
+function parseUploadError(raw: string) {
+  try {
+    const parsed = JSON.parse(raw) as { error?: string; message?: string; data?: unknown }
+    return String(parsed.error || parsed.message || '')
+  } catch {
+    return raw.trim()
+  }
+}
+
+function parseUploadResponse(raw: unknown) {
+  if (raw && typeof raw === 'object') {
+    const payload = raw as { error?: string; data?: unknown }
+    if (payload.error) {
+      throw new Error(payload.error)
+    }
+    return payload.data ?? payload
+  }
+
+  const text = String(raw || '').trim()
+  if (!text) {
+    throw new Error('上传返回为空')
+  }
+
+  try {
+    const parsed = JSON.parse(text) as { error?: string; data?: unknown }
+    if (parsed.error) {
+      throw new Error(parsed.error)
+    }
+    return parsed.data ?? parsed
+  } catch {
+    throw new Error('上传返回格式错误')
+  }
 }
 
 export function getFileDownloadUrl(fileId: number) {
