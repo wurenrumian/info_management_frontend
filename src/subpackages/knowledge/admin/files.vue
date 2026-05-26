@@ -4,10 +4,9 @@ import LayoutShell from '@/components/layout-shell.vue'
 import { deleteFile, getFileList, searchFiles, uploadFile, type SearchFileItem, type UploadedFile } from '@/services/file'
 import { useUserStore } from '@/stores/user'
 import { UserRole } from '@/constants/enums'
+import { pickDocumentFiles } from '@/utils/file-picker'
 
 const LIMIT = 50
-const DOC_EXT = new Set(['pdf', 'doc', 'docx', 'xls', 'xlsx'])
-
 const userStore = useUserStore()
 const hasPermission = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
 const isSuperAdmin = computed(() => Number(userStore.userInfo?.role || 0) === UserRole.SUPER_ADMIN)
@@ -21,6 +20,8 @@ const searchResults = ref<SearchFileItem[]>([])
 const searchTotal = ref(0)
 const searched = ref(false)
 const error = ref('')
+
+const DOC_EXT = new Set(['pdf', 'doc', 'docx', 'xls', 'xlsx'])
 
 function getExt(name: string) {
   const idx = name.lastIndexOf('.')
@@ -49,32 +50,6 @@ async function loadFiles() {
   }
 }
 
-function pickLocalFiles() {
-  const chooser = (uni as unknown as { chooseMessageFile?: Function; chooseFile?: Function })
-  return new Promise<Array<{ path: string; name: string }>>((resolve, reject) => {
-    const onSuccess = (res: { tempFiles?: Array<{ name?: string; path?: string }> }) => {
-      const picked = (res.tempFiles || [])
-        .map((item) => ({ name: String(item.name || ''), path: String(item.path || '') }))
-        .filter((item) => item.path && DOC_EXT.has(getExt(item.name)))
-      resolve(picked)
-    }
-
-    const onFail = (err: unknown) => reject(err)
-
-    if (typeof chooser.chooseMessageFile === 'function') {
-      chooser.chooseMessageFile({ count: 10, type: 'file', success: onSuccess, fail: onFail })
-      return
-    }
-
-    if (typeof chooser.chooseFile === 'function') {
-      chooser.chooseFile({ count: 10, type: 'all', success: onSuccess, fail: onFail })
-      return
-    }
-
-    reject(new Error('当前端不支持文件选择'))
-  })
-}
-
 async function uploadDocs() {
   if (!hasPermission.value) {
     return
@@ -82,14 +57,14 @@ async function uploadDocs() {
 
   uploading.value = true
   try {
-    const picked = await pickLocalFiles()
+    const picked = await pickDocumentFiles(10)
     if (picked.length === 0) {
       uni.showToast({ title: '请先选择文档文件', icon: 'none' })
       return
     }
 
     for (const file of picked) {
-      await uploadFile(file.path, 'knowledge')
+      await uploadFile(file.file || file.path, 'knowledge')
     }
 
     uni.showToast({ title: `上传成功 ${picked.length} 个`, icon: 'success' })
