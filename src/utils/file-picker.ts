@@ -19,9 +19,13 @@ function pickFromH5Input(count: number): Promise<PickedLocalFile[]> {
   return new Promise((resolve, reject) => {
     const input = document.createElement('input')
     let settled = false
+    let focusTimer = 0
 
     const cleanup = () => {
       window.removeEventListener('focus', onWindowFocus)
+      if (focusTimer) {
+        window.clearTimeout(focusTimer)
+      }
       input.remove()
     }
 
@@ -40,11 +44,13 @@ function pickFromH5Input(count: number): Promise<PickedLocalFile[]> {
     }
 
     const onWindowFocus = () => {
-      window.setTimeout(() => {
+      // File dialogs usually restore focus before firing `change`.
+      // Delay the empty-result fallback long enough for the browser event queue.
+      focusTimer = window.setTimeout(() => {
         if (!settled) {
           finish([])
         }
-      }, 0)
+      }, 300)
     }
 
     input.type = 'file'
@@ -62,6 +68,7 @@ function pickFromH5Input(count: number): Promise<PickedLocalFile[]> {
         }))
       finish(picked)
     })
+    input.addEventListener('cancel', () => finish([]))
 
     window.addEventListener('focus', onWindowFocus, { once: true })
     document.body.appendChild(input)
