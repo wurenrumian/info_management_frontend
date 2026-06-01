@@ -34,7 +34,23 @@ export interface AuthToken {
 export interface PublicRegisterRequest {
   student_id: string
   name: string
+  password?: string
   code?: string
+}
+
+export interface PublicLoginRequest {
+  student_id: string
+  password: string
+  code?: string
+}
+
+export interface ChangePasswordRequest {
+  current_password: string
+  new_password: string
+}
+
+export interface ChangePasswordResult {
+  ok: boolean
 }
 
 export type SubscribeCheckStatus = 'accept' | 'reject'

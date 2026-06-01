@@ -80,6 +80,10 @@ function goEditPage() {
   uni.navigateTo({ url: '/pages/profile/edit' })
 }
 
+function goChangePassword() {
+  uni.navigateTo({ url: '/pages/profile/change-password' })
+}
+
 function goHome() {
   uni.reLaunch({ url: '/pages/home/index' })
 }
@@ -155,6 +159,8 @@ onMounted(() => {
           <template #default>
             <view class="action-group">
               <nut-button plain @click="loadProfile">刷新数据</nut-button>
+              <nut-button plain @click="goEditPage">编辑资料</nut-button>
+              <nut-button plain @click="goChangePassword">修改密码</nut-button>
               <nut-button plain @click="goHome">返回首页</nut-button>
               <nut-button type="danger" @click="handleLogout">退出登录</nut-button>
             </view>

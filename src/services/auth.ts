@@ -1,11 +1,22 @@
 import { request } from './request'
-import type { AuthToken, UserInfo, DevLoginSubscribeCheckRequest, DevLoginSubscribeCheckResult, PublicRegisterRequest } from '@/types/user'
+import type {
+  AuthToken,
+  ChangePasswordRequest,
+  ChangePasswordResult,
+  DevLoginSubscribeCheckRequest,
+  DevLoginSubscribeCheckResult,
+  PublicLoginRequest,
+  PublicRegisterRequest,
+  UserInfo,
+} from '@/types/user'
 import {
-  API_AUTH_LOGIN,
   API_AUTH_BIND,
-  API_AUTH_PUBLIC_REGISTER,
+  API_AUTH_CHANGE_PASSWORD,
   API_AUTH_DEV_LOGIN,
   API_AUTH_DEV_LOGIN_SUBSCRIBE_CHECK,
+  API_AUTH_LOGIN,
+  API_AUTH_PUBLIC_LOGIN,
+  API_AUTH_PUBLIC_REGISTER,
   API_AUTH_USER_INFO,
 } from '@/constants/api'
 
@@ -20,6 +31,15 @@ export function wechatLogin(code: string) {
     method: 'POST',
     withAuth: false,
     data: { code },
+  })
+}
+
+export function publicLogin(payload: PublicLoginRequest) {
+  return request<AuthToken>({
+    url: API_AUTH_PUBLIC_LOGIN,
+    method: 'POST',
+    withAuth: false,
+    data: payload as unknown as Record<string, unknown>,
   })
 }
 
@@ -46,6 +66,14 @@ export function publicRegister(payload: PublicRegisterRequest) {
     url: API_AUTH_PUBLIC_REGISTER,
     method: 'POST',
     withAuth: false,
+    data: payload as unknown as Record<string, unknown>,
+  })
+}
+
+export function changePassword(payload: ChangePasswordRequest) {
+  return request<ChangePasswordResult>({
+    url: API_AUTH_CHANGE_PASSWORD,
+    method: 'PATCH',
     data: payload as unknown as Record<string, unknown>,
   })
 }

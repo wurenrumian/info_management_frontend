@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { onLoad } from '@dcloudio/uni-app'
-import { devLogin, getUserInfo, publicRegister, wechatLogin } from '@/services/auth'
+import { devLogin, getUserInfo, publicLogin, publicRegister, wechatLogin } from '@/services/auth'
 import { useUserStore } from '@/stores/user'
 import type { AuthToken } from '@/types/user'
 import { isWeixinMiniProgram } from '@/utils/platform'
 
-type LoginMode = 'wechat' | 'public' | 'dev'
+type LoginMode = 'wechat' | 'password' | 'public' | 'dev'
 
 const userStore = useUserStore()
 const loading = ref(false)
 const mode = ref<LoginMode>('wechat')
 const isDev = import.meta.env.DEV
 const isMpWeixin = isWeixinMiniProgram()
+
+const passwordStudentId = ref('')
+const passwordValue = ref('')
 
 const publicStudentId = ref('')
 const publicName = ref('')
@@ -24,6 +27,7 @@ const devRole = ref(1)
 const modeTabs = computed(() => {
   const tabs: Array<{ key: LoginMode; label: string }> = [
     { key: 'wechat', label: '微信登录' },
+    { key: 'password', label: '账号密码登录' },
     { key: 'public', label: '公开注册/激活' },
   ]
   if (isDev) {
@@ -34,7 +38,7 @@ const modeTabs = computed(() => {
 
 onLoad((query) => {
   const qMode = String(query?.mode || '')
-  if (qMode === 'public' || (qMode === 'dev' && isDev) || qMode === 'wechat') {
+  if (qMode === 'public' || qMode === 'password' || (qMode === 'dev' && isDev) || qMode === 'wechat') {
     mode.value = qMode as LoginMode
   }
 })
@@ -109,6 +113,35 @@ async function handleWechatLogin() {
   }
 }
 
+async function handlePublicLogin() {
+  if (!passwordStudentId.value.trim() || !passwordValue.value.trim()) {
+    uni.showToast({ title: '请输入学号和密码', icon: 'none' })
+    return
+  }
+
+  loading.value = true
+  try {
+    userStore.logout()
+    const payload: { student_id: string; password: string; code?: string } = {
+      student_id: passwordStudentId.value.trim(),
+      password: passwordValue.value,
+    }
+
+    if (isMpWeixin) {
+      const code = await getLoginCode()
+      payload.code = code
+    }
+
+    const auth = await publicLogin(payload)
+    await persistAuth(auth)
+  } catch (e) {
+    const message = e instanceof Error ? e.message : '账号密码登录失败'
+    uni.showToast({ title: message, icon: 'none' })
+  } finally {
+    loading.value = false
+  }
+}
+
 async function handlePublicRegister() {
   if (!publicStudentId.value.trim() || !publicName.value.trim()) {
     uni.showToast({ title: '请输入学号和姓名', icon: 'none' })
@@ -162,7 +195,7 @@ async function handleDevLogin() {
 
 <template>
   <view class="login-page page-container">
-    <content-panel class="login-card" title="登录" sub-title="微信登录、公开注册/激活与开发快捷登录">
+    <content-panel class="login-card" title="登录" sub-title="微信登录、账号密码登录、公开注册/激活与开发快捷登录">
       <template #default>
         <view class="tab-row">
           <nut-button
@@ -183,7 +216,20 @@ async function handleDevLogin() {
           </view>
           <text class="panel-hint">适用于已绑定微信账号的用户</text>
           <nut-button type="primary" block :loading="loading" @click="handleWechatLogin">微信登录并进入个人主页</nut-button>
+          <nut-button plain block @click="selectMode('password')">切换到账号密码登录</nut-button>
           <nut-button plain block @click="selectMode('public')">未绑定？改用公开注册/激活</nut-button>
+        </view>
+
+        <view v-else-if="mode === 'password'" class="panel">
+          <view class="panel-title-row">
+            <nut-icon name="lock" />
+            <text class="panel-title">账号密码登录</text>
+          </view>
+          <text class="panel-hint">使用学号和密码登录，支持登录时同步绑定微信</text>
+          <nut-input v-model="passwordStudentId" placeholder="请输入学号" />
+          <nut-input v-model="passwordValue" placeholder="请输入密码" type="password" />
+          <nut-button type="primary" block :loading="loading" @click="handlePublicLogin">账号密码登录</nut-button>
+          <nut-button plain block @click="selectMode('public')">去公开注册/激活</nut-button>
         </view>
 
         <view v-else-if="mode === 'public'" class="panel">
