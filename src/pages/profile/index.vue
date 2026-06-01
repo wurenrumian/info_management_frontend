@@ -6,7 +6,6 @@ import { getProfileEditableInfo, getProfileHomeViewModel } from '@/services/prof
 import type { ProfileHomeViewModel } from '@/types/profile'
 import type { UserInfo } from '@/types/user'
 import { useUserStore } from '@/stores/user'
-import { UserRole } from '@/constants/enums'
 
 const userStore = useUserStore()
 const loading = ref(true)
@@ -59,8 +58,6 @@ const avatarUrl = computed(() => {
   return fromCache || ''
 })
 
-const canOpenAdminApprovalPanel = computed(() => Number(userStore.userInfo?.role || 0) >= UserRole.LEAGUE_CADRE)
-
 async function loadProfile() {
   loading.value = true
   error.value = ''
@@ -81,26 +78,6 @@ async function loadProfile() {
 
 function goEditPage() {
   uni.navigateTo({ url: '/pages/profile/edit' })
-}
-
-function goAnnouncements() {
-  uni.navigateTo({ url: '/subpackages/announcements/index' })
-}
-
-function goApprovals() {
-  uni.navigateTo({ url: '/subpackages/approvals/index' })
-}
-
-function goApprovalAdmin() {
-  uni.navigateTo({ url: '/subpackages/approvals/admin/index' })
-}
-
-function goPartyflow() {
-  uni.navigateTo({ url: '/subpackages/partyflow/index' })
-}
-
-function goCertificates() {
-  uni.navigateTo({ url: '/subpackages/certificates/index' })
 }
 
 function goHome() {
@@ -171,25 +148,6 @@ onMounted(() => {
                 <nut-tag type="warning">{{ profile.account.wechatBound ? '微信已绑定' : '微信未绑定' }}</nut-tag>
               </view>
             </view>
-          </template>
-        </content-panel>
-
-        <content-panel title="我的数据">
-          <template #default>
-            <nut-cell title="公告" :desc="String(profile.quickEntry.announcementsCount)" icon="message" />
-            <nut-cell title="审批" :desc="String(profile.quickEntry.approvalsCount)" icon="checked" />
-            <nut-cell title="知识库" :desc="String(profile.quickEntry.knowledgeCount)" icon="category" />
-            <nut-cell title="未读通知" :desc="String(profile.quickEntry.unreadNotifications)" icon="notice" />
-          </template>
-        </content-panel>
-
-        <content-panel title="常用入口">
-          <template #default>
-            <nut-cell title="信息发布" desc="查看通知和活动消息" icon="message" is-link @click="goAnnouncements" />
-            <nut-cell title="审批流程" desc="发起申请或处理任务" icon="checked" is-link @click="goApprovals" />
-            <nut-cell v-if="canOpenAdminApprovalPanel" title="审批管理" desc="进入老师/管理员审批面板" icon="service" is-link @click="goApprovalAdmin" />
-            <nut-cell title="党团流程" desc="查看阶段与提醒" icon="notice" is-link @click="goPartyflow" />
-            <nut-cell title="电子证件" desc="申请和查看证明记录" icon="tips" is-link @click="goCertificates" />
           </template>
         </content-panel>
 

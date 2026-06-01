@@ -30,17 +30,54 @@ function switchFormType(type: ApprovalFormType) {
   formState.approvalType = type
 }
 
+function trimText(value: string) {
+  return String(value || '').trim()
+}
+
+function isValidDateTimeText(value: string) {
+  const text = trimText(value)
+  if (!/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$/.test(text)) {
+    return false
+  }
+  return !Number.isNaN(Date.parse(text.replace(' ', 'T')))
+}
+
+function isValidDateText(value: string) {
+  const text = trimText(value)
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return false
+  }
+  return !Number.isNaN(Date.parse(text))
+}
+
+function isValidPhoneText(value: string) {
+  return /^1\d{10}$/.test(trimText(value))
+}
+
+function isValidSemesterText(value: string) {
+  const text = trimText(value)
+  return text === '' || /^\d{4}-\d{1,2}$/.test(text)
+}
+
+function isValidPositiveAmount(value: string) {
+  const amount = Number(trimText(value))
+  return Number.isFinite(amount) && amount > 0
+}
+
 async function submitForm() {
-  if (!formState.title.trim()) {
+  const title = trimText(formState.title)
+  if (!title) {
     uni.showToast({ title: '请填写申请标题', icon: 'none' })
     return
   }
 
-  const payload =
-    formState.approvalType === 'leave'
-      ? buildLeavePayload()
-      : buildBudgetPayload()
+  const semester = trimText(formState.semester)
+  if (semester && !isValidSemesterText(semester)) {
+    uni.showToast({ title: '学期格式不正确', icon: 'none' })
+    return
+  }
 
+  const payload = formState.approvalType === 'leave' ? buildLeavePayload() : buildBudgetPayload()
   if (!payload) {
     return
   }
@@ -48,9 +85,9 @@ async function submitForm() {
   try {
     const res = await submitApproval({
       approval_type: formState.approvalType,
-      title: formState.title.trim(),
+      title,
       form_data: payload,
-      semester: formState.semester.trim() || undefined,
+      semester: semester || undefined,
     })
     uni.showToast({ title: '提交成功', icon: 'success' })
     if (res.id) {
@@ -65,50 +102,64 @@ async function submitForm() {
 }
 
 function buildLeavePayload() {
-  if (!formState.leave.reason.trim()) {
+  const reason = trimText(formState.leave.reason)
+  const startAt = trimText(formState.leave.startAt)
+  const endAt = trimText(formState.leave.endAt)
+  const contactPhone = trimText(formState.leave.contactPhone)
+
+  if (!reason) {
     uni.showToast({ title: '请填写请假原因', icon: 'none' })
     return null
   }
-  if (!formState.leave.startAt.trim() || !formState.leave.endAt.trim()) {
-    uni.showToast({ title: '请填写请假起止时间', icon: 'none' })
+  if (!isValidDateTimeText(startAt) || !isValidDateTimeText(endAt)) {
+    uni.showToast({ title: '请填写正确的请假起止时间', icon: 'none' })
     return null
   }
-  if (!formState.leave.contactPhone.trim()) {
-    uni.showToast({ title: '请填写联系电话', icon: 'none' })
+  if (Date.parse(startAt.replace(' ', 'T')) >= Date.parse(endAt.replace(' ', 'T'))) {
+    uni.showToast({ title: '请假结束时间必须晚于开始时间', icon: 'none' })
+    return null
+  }
+  if (!isValidPhoneText(contactPhone)) {
+    uni.showToast({ title: '联系电话格式不正确', icon: 'none' })
     return null
   }
 
   return {
-    reason: formState.leave.reason.trim(),
-    start_at: formState.leave.startAt.trim(),
-    end_at: formState.leave.endAt.trim(),
-    contact_phone: formState.leave.contactPhone.trim(),
+    reason,
+    start_at: startAt,
+    end_at: endAt,
+    contact_phone: contactPhone,
   }
 }
 
 function buildBudgetPayload() {
-  if (!formState.budget.activityName.trim()) {
+  const activityName = trimText(formState.budget.activityName)
+  const activityDate = trimText(formState.budget.activityDate)
+  const budgetAmountText = trimText(formState.budget.budgetAmount)
+  const purpose = trimText(formState.budget.purpose)
+
+  if (!activityName) {
     uni.showToast({ title: '请填写活动名称', icon: 'none' })
     return null
   }
-  if (!formState.budget.activityDate.trim()) {
-    uni.showToast({ title: '请填写活动日期', icon: 'none' })
+  if (!isValidDateText(activityDate)) {
+    uni.showToast({ title: '活动日期格式不正确', icon: 'none' })
     return null
   }
-  if (!formState.budget.budgetAmount.trim()) {
-    uni.showToast({ title: '请填写预算金额', icon: 'none' })
+  if (!isValidPositiveAmount(budgetAmountText)) {
+    uni.showToast({ title: '预算金额格式不正确', icon: 'none' })
     return null
   }
-  if (!formState.budget.purpose.trim()) {
+  if (!purpose) {
     uni.showToast({ title: '请填写预算用途', icon: 'none' })
     return null
   }
 
   return {
-    activity_name: formState.budget.activityName.trim(),
-    activity_date: formState.budget.activityDate.trim(),
-    budget_amount: Number(formState.budget.budgetAmount),
-    purpose: formState.budget.purpose.trim(),
+    activity_name: activityName,
+    activity_date: activityDate,
+    budget_amount: Number(budgetAmountText),
+    purpose,
   }
 }
 </script>
